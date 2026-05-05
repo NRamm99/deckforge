@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Deckforge</title>
+</head>
+<body>
+<img th:src="@{/images/deckforgelogo.png}" alt="DeckForge" class="index-logo">
+<div class="welcome">
+
+    <h1>Velkommen!</h1>
+    <p class="welcome-intro">DeckForge er din digitale platform til Magic: The Gathering.</p>
+    <ul class="welcome-list">
+        <li>Organisér dine decks</li>
+        <li>Hold styr på din samling</li>
+        <li>Deltag i events</li>
+        <li>Byt kort med andre spillere</li>
+    </ul>
+    <p class="welcome-tagline">Skabt til spillere. Bygget til fællesskabet.</p>
+    <div class="index-buttons">
+        <a th:href="@{/login}" class="btn">Log ind</a>
+        <a th:href="@{/register}" class="btn">Registrer</a>
+    </div>
+</div>
+
+
+</body>
+</html>
