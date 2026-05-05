@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Profil - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+
+<div class="profile-card">
+
+    <section class="profile-header" aria-label="Profiloplysninger">
+        <div class="profile-avatar" aria-hidden="true">
+            <span>DF</span>
+        </div>
+
+        <div class="profile-identity">
+            <h1 th:text="${profile.displayName}">Brugernavn</h1>
+            <p class="profile-email" th:text="${profile.email}">email@email.dk</p>
+        </div>
+    </section>
+
+    <section class="profile-details" aria-label="Kontodetaljer">
+        <div class="profile-detail">
+            <span class="profile-detail-label">Samling</span>
+            <span class="profile-detail-value" th:text="${profile.collectionVisibility}">PUBLIC</span>
+        </div>
+
+        <div class="profile-detail">
+            <span class="profile-detail-label">Profiltype</span>
+            <span class="profile-detail-value">User/admin</span>
+        </div>
+    </section>
+
+    <div class="profile-actions">
+
+        <a href="#" class="btn profile-btn">Se samling</a>
+        <a href="#" class="btn profile-btn">Se decks</a>
+
+    </div>
+
+</div>
+</main>
+
+</body>
+</html>

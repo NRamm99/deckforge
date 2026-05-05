@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Log ind - DeckForge</title>
+</head>
+<body>
+
+<img th:src="@{/images/deckforgelogo.png}" alt="DeckForge" class="index-logo">
+
+<div class="auth-card">
+    <h1>Log ind</h1>
+
+    <form th:action="@{/auth/login}" method="post" class="auth-form">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="din@email.dk" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Adgangskode</label>
+            <input id="password" name="password" type="password" placeholder="Din adgangskode" required>
+        </div>
+
+        <button type="submit" class="btn auth-btn">Log ind</button>
+    </form>
+
+    <p class="auth-link">
+        Har du ikke en konto?
+        <a th:href="@{/register}">Registrer her</a>
+    </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+spring.application.name=deckforge
+spring.datasource.url=jdbc:mysql://localhost:3306/deckforge_db
+spring.datasource.username=root
+spring.datasource.password=INDSÆT_KODE_HER
+spring.sql.init.mode=always
