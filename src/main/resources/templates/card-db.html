@@ -19,18 +19,10 @@
     <section class="panel">
         <h1>Kortdatabase</h1>
 
-        <p th:if="${successMessage}" th:text="${successMessage}" class="message message-success"></p>
-        <p th:if="${errorMessage}" th:text="${errorMessage}" class="message message-error"></p>
-
-        <form th:action="@{/card-db}" method="post" th:object="${cardForm}" class="form">
+        <form th:action="@{/card-db}" method="get" th:object="${filter}" class="form">
             <div class="form-row">
                 <label for="name">Navn</label>
-                <input id="name" type="text" th:field="*{name}" required>
-            </div>
-
-            <div class="form-row">
-                <label for="description">Beskrivelse</label>
-                <textarea id="description" th:field="*{description}" rows="3"></textarea>
+                <input id="name" type="text" th:field="*{name}">
             </div>
 
             <div class="form-row">
@@ -39,36 +31,39 @@
             </div>
 
             <div class="form-row">
-                <label for="rarity">Rarity</label>
-                <select id="rarity" th:field="*{rarity}">
-                    <option value="">(none)</option>
-                    <option th:each="r : ${rarities}" th:value="${r}" th:text="${r}"></option>
-                </select>
-            </div>
-
-            <div class="form-row">
-                <label for="cardType">Type</label>
-                <select id="cardType" th:field="*{cardType}">
-                    <option value="">(none)</option>
-                    <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
-                </select>
-            </div>
-
-            <div class="form-row">
-                <label for="color">Color</label>
-                <select id="color" th:field="*{color}">
-                    <option value="">(none)</option>
-                    <option th:each="c : ${colors}" th:value="${c}" th:text="${c}"></option>
-                </select>
-            </div>
-
-            <div class="form-row">
                 <label for="mana">Mana</label>
                 <input id="mana" type="text" th:field="*{mana}">
             </div>
 
+            <div class="form-row-3">
+                <div class="form-row">
+                    <label for="rarity">Rarity</label>
+                    <select id="rarity" th:field="*{rarity}">
+                        <option value="">(none)</option>
+                        <option th:each="r : ${rarities}" th:value="${r}" th:text="${r}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="cardType">Type</label>
+                    <select id="cardType" th:field="*{cardType}">
+                        <option value="">(none)</option>
+                        <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="color">Color</label>
+                    <select id="color" th:field="*{color}">
+                        <option value="">(none)</option>
+                        <option th:each="c : ${colors}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-actions">
-                <button class="btn" type="submit">Opret kort</button>
+                <button class="btn" type="submit">Søg / filtrer</button>
+                <a class="btn" th:href="@{/card-db}">Nulstil</a>
             </div>
         </form>
     </section>
@@ -79,6 +74,7 @@
         <table class="table">
             <thead>
             <tr>
+                <th>Billede</th>
                 <th>Navn</th>
                 <th>Set</th>
                 <th>Rarity</th>
@@ -89,6 +85,11 @@
             </thead>
             <tbody>
             <tr th:each="card : ${cards}">
+                <td>
+                    <div class="card-thumb">
+                        <img th:if="${card.imageUrl}" th:src="${card.imageUrl}" alt="" loading="lazy">
+                    </div>
+                </td>
                 <td th:text="${card.name}">Card Name</td>
                 <td th:text="${card.cardSet}">Set</td>
                 <td th:text="${card.rarity}">COMMON</td>
