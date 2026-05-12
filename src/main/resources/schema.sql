@@ -16,3 +16,15 @@ CREATE TABLE IF NOT EXISTS player_profile (
         REFERENCES user_account(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS card (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    card_set VARCHAR(255),
+    rarity VARCHAR(50),
+    card_type VARCHAR(50),
+    color VARCHAR(50),
+    image_url VARCHAR(1024),
+    mana VARCHAR(50)
+);

@@ -5,24 +5,26 @@ public class Card {
     private long id;
     private String name;
     private String description;
-    private String setName;
+    private String cardSet;
     private CardRarity rarity;
     private CardType cardType;
     private CardColor color;
     private String imageUrl;
+    private String mana;
 
     public Card() {
     }
 
-    public Card(long id, String name, String description, String setName, CardRarity rarity, CardType cardType, CardColor color, String imageUrl) {
+    public Card(long id, String name, String description, String cardSet, CardRarity rarity, CardType cardType, CardColor color, String imageUrl, String mana) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.setName = setName;
+        this.cardSet = cardSet;
         this.rarity = rarity;
         this.cardType = cardType;
         this.color = color;
         this.imageUrl = imageUrl;
+        this.mana = mana;
     }
 
     public long getId() {
@@ -49,12 +51,12 @@ public class Card {
         this.description = description;
     }
 
-    public String getSetName() {
-        return setName;
+    public String getCardSet() {
+        return cardSet;
     }
 
-    public void setSetName(String setName) {
-        this.setName = setName;
+    public void setCardSet(String setName) {
+        this.cardSet = setName;
     }
 
     public CardRarity getRarity() {
@@ -88,4 +90,8 @@ public class Card {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public String getMana() { return mana; }
+
+    public void setMana(String mana) { this.mana = mana; }
 }
