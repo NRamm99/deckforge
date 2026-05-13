@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/create-card.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Deckforge</title>
+</head>
+<body>
+    <header>
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+    </header>
+<main>
+    <section class="create-card-shell">
+        <div class="create-card-card">
+            <h1 class="create-card-title">Opret kort</h1>
+
+            <div class="create-card-error" th:if="${error}" th:text="${error}"></div>
+
+            <form class="create-card-form" th:action="@{/create-card}" th:object="${card}" method="post" autocomplete="off">
+                <div class="form-group">
+                    <label for="name">Navn</label>
+                    <input id="name" type="text" th:field="*{name}" required maxlength="120" placeholder="Kortnavn">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Beskrivelse</label>
+                    <textarea id="description" th:field="*{description}" rows="4" maxlength="2000" placeholder="Korttekst"></textarea>
+                </div>
+
+                <div class="create-card-grid">
+                    <div class="form-group">
+                        <label for="cardSet">Set</label>
+                        <input id="cardSet" type="text" th:field="*{cardSet}" maxlength="120" placeholder="Set/udgivelse">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mana">Mana</label>
+                        <input id="mana" type="text" th:field="*{mana}" maxlength="40" placeholder="f.eks. 2G">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rarity">Rarity</label>
+                        <select id="rarity" th:field="*{rarity}">
+                            <option value="">(valgfri)</option>
+                            <option th:each="r : ${rarities}" th:value="${r}" th:text="${r}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cardType">Type</label>
+                        <select id="cardType" th:field="*{cardType}">
+                            <option value="">(valgfri)</option>
+                            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <select id="color" th:field="*{color}">
+                            <option value="">(valgfri)</option>
+                            <option th:each="c : ${colors}" th:value="${c}" th:text="${c}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group create-card-image-url">
+                        <label for="imageUrl">Billede (URL)</label>
+                        <input id="imageUrl" type="url" th:field="*{imageUrl}" inputmode="url" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="create-card-preview-row">
+                    <div class="create-card-preview">
+                        <img id="imagePreview" alt="Kortbillede preview" loading="lazy">
+                    </div>
+
+                    <button class="btn auth-btn create-card-submit" type="submit">Opret</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<script>
+    (function () {
+        const input = document.getElementById('imageUrl');
+        const img = document.getElementById('imagePreview');
+
+        function normalizeUrl(value) {
+            if (!value) return '';
+            return String(value).trim();
+        }
+
+        function setPreview(url) {
+            const u = normalizeUrl(url);
+            if (!u) {
+                img.removeAttribute('src');
+                img.classList.add('is-empty');
+                return;
+            }
+            img.classList.remove('is-empty');
+            img.src = u;
+        }
+
+        img.addEventListener('error', function () {
+            img.classList.add('is-broken');
+        });
+        img.addEventListener('load', function () {
+            img.classList.remove('is-broken');
+        });
+
+        input.addEventListener('input', function (e) {
+            setPreview(e.target.value);
+        });
+
+        setPreview(input.value);
+    })();
+</script>
+</body>
+</html>

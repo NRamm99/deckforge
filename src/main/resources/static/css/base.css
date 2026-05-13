@@ -42,13 +42,18 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: whitesmoke;
-    font-size: 16px;
+    /* font-size: 16px; */
 
     width: 100px;
     height: 50px;
     background-color: #276c4d;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 15px;
+
+    /* border fix for button */
+    border: none;
+    font: inherit;
+    appearance: none;
+    -webkit-appearance: none;
 
     transition: 0.2s;
 }

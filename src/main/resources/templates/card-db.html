@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/card-db.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Kortdatabase - DeckForge</title>
+</head>
+<body class="card-db">
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main class="page">
+
+    <section class="panel">
+        <h1>Kortdatabase</h1>
+
+        <form th:action="@{/card-db}" method="get" th:object="${filter}" class="form">
+            <div class="form-row">
+                <label for="name">Navn</label>
+                <input id="name" type="text" th:field="*{name}">
+            </div>
+
+            <div class="form-row">
+                <label for="cardSet">Set</label>
+                <input id="cardSet" type="text" th:field="*{cardSet}">
+            </div>
+
+            <div class="form-row">
+                <label for="mana">Mana</label>
+                <input id="mana" type="text" th:field="*{mana}">
+            </div>
+
+            <div class="form-row-3">
+                <div class="form-row">
+                    <label for="rarity">Rarity</label>
+                    <select id="rarity" th:field="*{rarity}">
+                        <option value="">(none)</option>
+                        <option th:each="r : ${rarities}" th:value="${r}" th:text="${r}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="cardType">Type</label>
+                    <select id="cardType" th:field="*{cardType}">
+                        <option value="">(none)</option>
+                        <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="color">Color</label>
+                    <select id="color" th:field="*{color}">
+                        <option value="">(none)</option>
+                        <option th:each="c : ${colors}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn" type="submit">Søg / filtrer</button>
+                <a class="btn" th:href="@{/card-db}">Nulstil</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Alle kort</h2>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Billede</th>
+                <th>Navn</th>
+                <th>Set</th>
+                <th>Rarity</th>
+                <th>Type</th>
+                <th>Color</th>
+                <th>Mana</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="card : ${cards}">
+                <td>
+                    <div class="card-thumb">
+                        <img th:if="${card.imageUrl}" th:src="${card.imageUrl}" alt="" loading="lazy">
+                    </div>
+                </td>
+                <td th:text="${card.name}">Card Name</td>
+                <td th:text="${card.cardSet}">Set</td>
+                <td th:text="${card.rarity}">COMMON</td>
+                <td th:text="${card.cardType}">CREATURE</td>
+                <td th:text="${card.color}">GREEN</td>
+                <td th:text="${card.mana}">1G</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(cards)}">
+                <td colspan="7">Ingen kort endnu.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+</body>
+</html>
