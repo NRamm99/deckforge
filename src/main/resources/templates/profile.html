@@ -36,14 +36,14 @@
 
         <div class="profile-detail">
             <span class="profile-detail-label">Profiltype</span>
-            <span class="profile-detail-value">User/admin</span>
+            <span class="profile-detail-value" th:text="${profile.roleLabel}">Bruger</span>
         </div>
     </section>
 
     <div class="profile-actions">
 
-        <a href="#" class="btn profile-btn">Se samling</a>
-        <a href="#" class="btn profile-btn">Se decks</a>
+        <a th:href="@{/profile/{id}/collection(id=${profile.userId})}" class="btn profile-btn">Se samling</a>
+        <a th:href="@{/profile/{id}/decks(id=${profile.userId})}" class="btn profile-btn">Se decks</a>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn profile-btn">Log ud</button>
         </form>

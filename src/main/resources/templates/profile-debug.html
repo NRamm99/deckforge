@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Debug profil - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card debug-profile-card">
+        <div>
+            <h1>Debug profil</h1>
+            <p>Rediger din konto direkte.</p>
+        </div>
+
+        <p class="debug-message debug-message-success" th:if="${success}" th:text="${success}">Gemt.</p>
+        <p class="debug-message debug-message-error" th:if="${error}" th:text="${error}">Fejl.</p>
+
+        <form class="debug-profile-form" th:action="@{/profile/debug}" method="post">
+            <div class="form-group">
+                <label for="displayName">Navn</label>
+                <input id="displayName" name="displayName" type="text" th:value="${profile.displayName}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" th:value="${profile.email}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Kodeord</label>
+                <input id="password" name="password" type="password" placeholder="Lad feltet være tomt for at beholde kodeordet">
+            </div>
+
+            <div class="debug-profile-grid">
+                <div class="form-group">
+                    <label for="role">Rolle</label>
+                    <select id="role" name="role">
+                        <option th:each="role : ${roles}"
+                                th:value="${role}"
+                                th:text="${role == T(dk.deckforge.app.domain.model.Role).ADMIN ? 'Administrator' : 'Bruger'}"
+                                th:selected="${role == profile.role}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="collectionVisibility">Synlighed</label>
+                    <select id="collectionVisibility" name="collectionVisibility">
+                        <option th:each="visibility : ${visibilities}"
+                                th:value="${visibility}"
+                                th:text="${visibility}"
+                                th:selected="${visibility == profile.collectionVisibility}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="debug-profile-actions">
+                <button class="btn profile-btn" type="submit">Gem</button>
+                <a class="btn profile-btn" th:href="@{/profile}">Tilbage</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

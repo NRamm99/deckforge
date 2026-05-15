@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Noget gik galt - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="error-card">
+        <span class="error-code" th:text="${status} ?: 'Fejl'">Fejl</span>
+        <h1>Noget gik galt</h1>
+        <p>Vi kunne ikke vise siden lige nu. Proev igen, eller gaa tilbage til din profil.</p>
+        <div class="error-actions">
+            <a class="btn profile-btn" th:href="@{/profile}">Til profil</a>
+            <a class="btn profile-btn" th:href="@{/}">Forside</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

@@ -28,3 +28,47 @@ CREATE TABLE IF NOT EXISTS card (
     image_url VARCHAR(1024),
     mana VARCHAR(50)
 );
+
+CREATE TABLE IF NOT EXISTS player_collection_card (
+    user_account_id BIGINT NOT NULL,
+    card_id BIGINT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (user_account_id, card_id),
+    CONSTRAINT fk_player_collection_user_account
+        FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_player_collection_card
+        FOREIGN KEY (card_id)
+        REFERENCES card(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS player_deck (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_account_id BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    format VARCHAR(50) NOT NULL,
+    concept_deck BOOLEAN NOT NULL DEFAULT FALSE,
+    visibility VARCHAR(50) NOT NULL DEFAULT 'PUBLIC',
+    CONSTRAINT fk_player_deck_user_account
+        FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS player_deck_card (
+    deck_id BIGINT NOT NULL,
+    card_id BIGINT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (deck_id, card_id),
+    CONSTRAINT fk_player_deck_card_deck
+        FOREIGN KEY (deck_id)
+        REFERENCES player_deck(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_player_deck_card_card
+        FOREIGN KEY (card_id)
+        REFERENCES card(id)
+        ON DELETE CASCADE
+);

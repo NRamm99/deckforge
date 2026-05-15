@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Decks - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card decks-card">
+        <div class="decks-header">
+            <div>
+                <h1 th:text="${profile.displayName} + 's decks'">Brugers decks</h1>
+                <p th:text="${ownProfile} ? 'Dine gemte decks' : 'Offentlige decks'">Gemte decks</p>
+            </div>
+            <a th:if="${ownProfile}" th:href="@{/deck-builder}" class="btn profile-btn">Byg deck</a>
+        </div>
+
+        <div class="decks-list" th:if="${!#lists.isEmpty(decks)}">
+            <p class="decks-message" th:if="${success}" th:text="${success}">Decket er slettet.</p>
+            <article class="deck-list-item" th:each="deck : ${decks}">
+                <div>
+                    <h2 th:text="${deck.name}">Decknavn</h2>
+                    <div class="deck-list-meta">
+                        <span th:text="'Ejer: ' + ${profile.displayName}">Ejer: Bruger</span>
+                        <span th:text="'Synlighed: ' + ${deck.visibility}">Synlighed: PUBLIC</span>
+                        <span th:text="${deck.conceptDeck} ? 'Concept deck' : 'Samling deck'">Samling deck</span>
+                    </div>
+                </div>
+                <dl>
+                    <div>
+                        <dt>Format</dt>
+                        <dd th:text="${deck.format}">STANDARD</dd>
+                    </div>
+                    <div>
+                        <dt>Kort</dt>
+                        <dd th:text="${deck.cardCount}">20</dd>
+                    </div>
+                </dl>
+                <a th:href="@{/profile/{id}/decks/{deckId}(id=${profile.userId}, deckId=${deck.id})}"
+                   class="btn deck-view-btn">Se</a>
+                <form th:if="${ownProfile}"
+                      th:action="@{/profile/{id}/decks/{deckId}/delete(id=${profile.userId}, deckId=${deck.id})}"
+                      method="post">
+                    <button class="btn deck-delete-btn" type="submit">Slet</button>
+                </form>
+            </article>
+        </div>
+
+        <p class="decks-empty" th:if="${#lists.isEmpty(decks)}">Ingen decks endnu.</p>
+    </section>
+</main>
+
+</body>
+</html>

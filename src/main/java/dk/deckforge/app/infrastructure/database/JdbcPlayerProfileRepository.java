@@ -71,6 +71,26 @@ public class JdbcPlayerProfileRepository implements PlayerProfileRepository {
         }
     }
 
+    @Override
+    public void updateDebugFields(long userAccountId, String displayName, Visibility collectionVisibility) {
+        String sql = """
+                UPDATE player_profile
+                SET display_name = ?, collection_visibility = ?
+                WHERE user_account_id = ?
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, displayName);
+            ps.setString(2, collectionVisibility.name());
+            ps.setLong(3, userAccountId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating debug profile fields", e);
+        }
+    }
+
     private PlayerProfile mapRow(ResultSet rs) throws SQLException {
         PlayerProfile profile = new PlayerProfile();
         profile.setId(rs.getLong("id"));

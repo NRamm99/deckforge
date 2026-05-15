@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/card-db.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Deck-builder - DeckForge</title>
+</head>
+<body class="card-db deck-builder">
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main class="page">
+
+    <section class="panel deck-builder-filter-panel">
+        <h1>Deck-builder</h1>
+
+        <form th:action="@{/deck-builder}" method="get" th:object="${filter}" class="form">
+            <div class="form-row">
+                <label for="name">Navn</label>
+                <input id="name" type="text" th:field="*{name}">
+            </div>
+
+            <div class="form-row">
+                <label for="cardSet">Set</label>
+                <input id="cardSet" type="text" th:field="*{cardSet}">
+            </div>
+
+            <div class="form-row">
+                <label for="mana">Mana</label>
+                <input id="mana" type="text" th:field="*{mana}">
+            </div>
+
+            <div class="form-row-3">
+                <div class="form-row">
+                    <label for="rarity">Rarity</label>
+                    <select id="rarity" th:field="*{rarity}">
+                        <option value="">(none)</option>
+                        <option th:each="r : ${rarities}" th:value="${r}" th:text="${r}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="cardType">Type</label>
+                    <select id="cardType" th:field="*{cardType}">
+                        <option value="">(none)</option>
+                        <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="color">Color</label>
+                    <select id="color" th:field="*{color}">
+                        <option value="">(none)</option>
+                        <option th:each="c : ${colors}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="deck-builder-options">
+                <label class="checkbox-row" for="conceptDeck">
+                    <input id="conceptDeck" name="conceptDeck" type="checkbox" value="true" th:checked="${conceptDeck}">
+                    <span>Concept deck</span>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn" type="submit">Søg / filtrer</button>
+                <a class="btn" th:href="@{/deck-builder}">Nulstil</a>
+            </div>
+        </form>
+    </section>
+
+    <div class="deck-builder-layout">
+        <section class="panel deck-builder-cards">
+            <h2>Kort</h2>
+
+            <p class="message message-success" th:if="${success}" th:text="${success}">Decket er ryddet.</p>
+            <p class="message message-error" th:if="${error}" th:text="${error}">Decket kunne ikke gemmes.</p>
+
+            <div class="card-image-grid" th:if="${!#lists.isEmpty(cards)}">
+                <div class="card-image-tile card-db-tile" th:each="cardView : ${cards}">
+                    <button class="card-preview-button"
+                            type="button"
+                            th:attr="data-dialog-id='deck-builder-card-preview-' + ${cardView.card.id}"
+                            aria-label="Vis kort større">
+                        <img th:if="${cardView.card.imageUrl}"
+                             th:src="${cardView.card.imageUrl}"
+                             th:alt="${cardView.card.name}"
+                             loading="lazy">
+                    </button>
+                    <form class="add-card-form"
+                          th:action="@{/deck-builder/{cardId}/add(cardId=${cardView.card.id})}"
+                          method="post">
+                        <input type="hidden" name="conceptDeck" th:value="${conceptDeck}">
+                        <button class="add-card-button"
+                                type="submit"
+                                th:disabled="${!cardView.canAdd}"
+                                aria-label="Tilføj kort til deck"
+                                title="Tilføj kort til deck">+</button>
+                    </form>
+                    <span class="collection-quantity deck-builder-owned-quantity"
+                          th:if="${cardView.ownedQuantity > 0}"
+                          th:text="'Ejer x' + ${cardView.ownedQuantity}">Ejer x1</span>
+                    <span class="collection-quantity deck-builder-deck-quantity"
+                          th:if="${cardView.deckQuantity > 0}"
+                          th:text="'Deck x' + ${cardView.deckQuantity}">Deck x1</span>
+                    <dialog class="card-preview-dialog" th:id="'deck-builder-card-preview-' + ${cardView.card.id}">
+                        <button class="card-preview-close" type="button" aria-label="Luk">x</button>
+                        <div class="card-preview-content">
+                            <img class="card-preview-image"
+                                 th:if="${cardView.card.imageUrl}"
+                                 th:src="${cardView.card.imageUrl}"
+                                 th:alt="${cardView.card.name}">
+                            <div class="card-preview-details">
+                                <h3 th:text="${cardView.card.name}">Card Name</h3>
+                                <dl>
+                                    <div>
+                                        <dt>I deck</dt>
+                                        <dd th:text="${cardView.deckQuantity}">0</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Ejet</dt>
+                                        <dd th:text="${cardView.ownedQuantity}">1</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Set</dt>
+                                        <dd th:text="${cardView.card.cardSet} ?: '-'">Set</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Rarity</dt>
+                                        <dd th:text="${cardView.card.rarity} ?: '-'">COMMON</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Type</dt>
+                                        <dd th:text="${cardView.card.cardType} ?: '-'">CREATURE</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Color</dt>
+                                        <dd th:text="${cardView.card.color} ?: '-'">GREEN</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Mana</dt>
+                                        <dd th:text="${cardView.card.mana} ?: '-'">1G</dd>
+                                    </div>
+                                </dl>
+                                <p class="card-preview-description"
+                                   th:if="${cardView.card.description}"
+                                   th:text="${cardView.card.description}">Description</p>
+                            </div>
+                        </div>
+                    </dialog>
+                </div>
+            </div>
+
+            <p class="collection-empty" th:if="${#lists.isEmpty(cards)}">Ingen kort matcher filteret.</p>
+        </section>
+
+        <aside class="panel deck-builder-deck-panel">
+            <div class="deck-builder-deck-header">
+                <h2>Valgte kort</h2>
+                <span th:text="${deckCardCount} + ' kort'">0 kort</span>
+            </div>
+
+            <div class="deck-builder-selected-list" th:if="${!#lists.isEmpty(selectedCards)}">
+                <div class="deck-builder-selected-card" th:each="cardView : ${selectedCards}">
+                    <img th:if="${cardView.card.imageUrl}"
+                         th:src="${cardView.card.imageUrl}"
+                         th:alt="${cardView.card.name}"
+                         loading="lazy">
+                    <div>
+                        <strong th:text="${cardView.card.name}">Card Name</strong>
+                        <span th:text="'x' + ${cardView.deckQuantity}">x1</span>
+                    </div>
+                    <form th:action="@{/deck-builder/{cardId}/remove(cardId=${cardView.card.id})}" method="post">
+                        <button type="submit" aria-label="Fjern kort fra deck" title="Fjern kort fra deck">-</button>
+                    </form>
+                </div>
+            </div>
+
+            <p class="collection-empty" th:if="${#lists.isEmpty(selectedCards)}">Ingen kort valgt endnu.</p>
+
+            <form class="deck-builder-save-form" th:action="@{/deck-builder/save}" method="post">
+                <input type="hidden" name="conceptDeck" th:value="${conceptDeck}">
+
+                <div class="form-row">
+                    <label for="deckName">Decknavn</label>
+                    <input id="deckName" name="deckName" type="text" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="format">Format</label>
+                    <select id="format" name="format">
+                        <option th:each="format : ${formats}"
+                                th:value="${format}"
+                                th:text="${format + ' (' + format.minDeckSize + '-' + format.maxDeckSize + ' kort)'}"
+                                th:selected="${format == selectedFormat}"></option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="visibility">Synlighed</label>
+                    <select id="visibility" name="visibility">
+                        <option th:each="visibility : ${visibilities}"
+                                th:value="${visibility}"
+                                th:text="${visibility}"
+                                th:selected="${visibility == selectedVisibility}"></option>
+                    </select>
+                </div>
+
+                <button class="btn deck-builder-save-button"
+                        type="submit"
+                        th:disabled="${#lists.isEmpty(selectedCards)}">Gem deck</button>
+            </form>
+
+            <form th:if="${!#lists.isEmpty(selectedCards)}" th:action="@{/deck-builder/clear}" method="post">
+                <button class="btn deck-builder-clear-button" type="submit">Ryd deck</button>
+            </form>
+        </aside>
+    </div>
+</main>
+
+<script>
+    document.querySelectorAll(".card-preview-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            document.getElementById(button.dataset.dialogId)?.showModal();
+        });
+    });
+
+    document.querySelectorAll(".card-preview-dialog").forEach((dialog) => {
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) {
+                dialog.close();
+            }
+        });
+
+        dialog.querySelector(".card-preview-close")?.addEventListener("click", () => dialog.close());
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Privat samling - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card decks-card">
+        <h1 th:text="${profile.displayName} + 's samling'">Brugers samling</h1>
+        <p class="decks-empty">Denne brugers kortsamling er privat.</p>
+        <a th:href="@{/profile/{id}(id=${profile.userId})}" class="btn profile-btn">Tilbage</a>
+    </section>
+</main>
+
+</body>
+</html>

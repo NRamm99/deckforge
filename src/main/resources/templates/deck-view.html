@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/card-db.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Deck - DeckForge</title>
+</head>
+<body class="card-db">
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main class="page">
+    <section class="panel">
+        <h1 th:text="${deck.name}">Decknavn</h1>
+        <dl class="deck-view-summary">
+            <div>
+                <dt>Ejer</dt>
+                <dd th:text="${profile.displayName}">Bruger</dd>
+            </div>
+            <div>
+                <dt>Format</dt>
+                <dd th:text="${deck.format}">STANDARD</dd>
+            </div>
+            <div>
+                <dt>Kort</dt>
+                <dd th:text="${deck.cardCount}">20</dd>
+            </div>
+            <div>
+                <dt>Type</dt>
+                <dd th:text="${deck.conceptDeck} ? 'Concept deck' : 'Samling deck'">Samling deck</dd>
+            </div>
+            <div>
+                <dt>Synlighed</dt>
+                <dd th:text="${deck.visibility}">PUBLIC</dd>
+            </div>
+        </dl>
+        <div class="deck-view-actions">
+            <a th:href="@{/profile/{id}/decks(id=${profile.userId})}" class="btn deck-back-btn">Tilbage</a>
+            <form th:if="${ownProfile}"
+                  th:action="@{/profile/{id}/decks/{deckId}/delete(id=${profile.userId}, deckId=${deck.id})}"
+                  method="post">
+                <button class="btn deck-delete-btn" type="submit">Slet</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Kort i decket</h2>
+
+        <div class="card-image-grid" th:if="${!#lists.isEmpty(cards)}">
+            <div class="card-image-tile collection-card-tile" th:each="deckCard : ${cards}">
+                <button class="card-preview-button"
+                        type="button"
+                        th:attr="data-dialog-id='deck-card-preview-' + ${deckCard.card.id}"
+                        aria-label="Vis kort stÃ¸rre">
+                    <img th:if="${deckCard.card.imageUrl}"
+                         th:src="${deckCard.card.imageUrl}"
+                         th:alt="${deckCard.card.name}"
+                         loading="lazy">
+                </button>
+                <span class="collection-quantity"
+                      th:text="'x' + ${deckCard.quantity}">x2</span>
+                <dialog class="card-preview-dialog" th:id="'deck-card-preview-' + ${deckCard.card.id}">
+                    <button class="card-preview-close" type="button" aria-label="Luk">x</button>
+                    <div class="card-preview-content">
+                        <img class="card-preview-image"
+                             th:if="${deckCard.card.imageUrl}"
+                             th:src="${deckCard.card.imageUrl}"
+                             th:alt="${deckCard.card.name}">
+                        <div class="card-preview-details">
+                            <h3 th:text="${deckCard.card.name}">Card Name</h3>
+                            <dl>
+                                <div>
+                                    <dt>Kopier</dt>
+                                    <dd th:text="${deckCard.quantity}">1</dd>
+                                </div>
+                                <div>
+                                    <dt>Set</dt>
+                                    <dd th:text="${deckCard.card.cardSet} ?: '-'">Set</dd>
+                                </div>
+                                <div>
+                                    <dt>Rarity</dt>
+                                    <dd th:text="${deckCard.card.rarity} ?: '-'">COMMON</dd>
+                                </div>
+                                <div>
+                                    <dt>Type</dt>
+                                    <dd th:text="${deckCard.card.cardType} ?: '-'">CREATURE</dd>
+                                </div>
+                                <div>
+                                    <dt>Color</dt>
+                                    <dd th:text="${deckCard.card.color} ?: '-'">GREEN</dd>
+                                </div>
+                                <div>
+                                    <dt>Mana</dt>
+                                    <dd th:text="${deckCard.card.mana} ?: '-'">1G</dd>
+                                </div>
+                            </dl>
+                            <p class="card-preview-description"
+                               th:if="${deckCard.card.description}"
+                               th:text="${deckCard.card.description}">Description</p>
+                        </div>
+                    </div>
+                </dialog>
+            </div>
+        </div>
+
+        <p class="collection-empty" th:if="${#lists.isEmpty(cards)}">Ingen kort i decket.</p>
+    </section>
+</main>
+
+<script>
+    document.querySelectorAll(".card-preview-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            document.getElementById(button.dataset.dialogId)?.showModal();
+        });
+    });
+
+    document.querySelectorAll(".card-preview-dialog").forEach((dialog) => {
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) {
+                dialog.close();
+            }
+        });
+
+        dialog.querySelector(".card-preview-close")?.addEventListener("click", () => dialog.close());
+    });
+</script>
+
+</body>
+</html>

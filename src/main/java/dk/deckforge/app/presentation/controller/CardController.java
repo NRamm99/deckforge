@@ -1,6 +1,9 @@
 package dk.deckforge.app.presentation.controller;
 
+import dk.deckforge.app.application.dto.ProfileView;
 import dk.deckforge.app.application.service.CardService;
+import dk.deckforge.app.application.service.CollectionService;
+import dk.deckforge.app.application.service.ProfileService;
 import dk.deckforge.app.domain.model.Card;
 import dk.deckforge.app.domain.model.CardColor;
 import dk.deckforge.app.domain.model.CardRarity;
@@ -9,20 +12,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Controller
 public class CardController {
 
     private final CardService cardService;
+    private final CollectionService collectionService;
+    private final ProfileService profileService;
 
-    public CardController(CardService cardService) {
+    public CardController(CardService cardService, CollectionService collectionService, ProfileService profileService) {
         this.cardService = cardService;
+        this.collectionService = collectionService;
+        this.profileService = profileService;
     }
 
     @GetMapping("/create-card")
@@ -50,12 +59,7 @@ public class CardController {
 
     @GetMapping("/card-db")
     public String cardDatabase(@ModelAttribute("filter") Card filter, Model model) {
-        List<Card> cards = cardService.getAllCards();
-        if (filter != null && hasAnyFilter(filter)) {
-            cards = cards.stream()
-                    .filter(c -> matchesFilter(c, filter))
-                    .collect(Collectors.toList());
-        }
+        List<Card> cards = cardService.filterCards(cardService.getAllCards(), filter);
 
         model.addAttribute("cards", cards);
         model.addAttribute("filter", filter == null ? new Card() : filter);
@@ -65,33 +69,27 @@ public class CardController {
         return "card-db";
     }
 
-    private boolean hasAnyFilter(Card filter) {
-        return notBlank(filter.getName())
-                || notBlank(filter.getCardSet())
-                || filter.getRarity() != null
-                || filter.getCardType() != null
-                || filter.getColor() != null
-                || notBlank(filter.getMana());
+    @PostMapping("/card-db/{cardId}/add")
+    public String addCardToCollection(@PathVariable long cardId,
+                                      Principal principal,
+                                      @RequestHeader(value = "Referer", required = false) String referer,
+                                      RedirectAttributes redirectAttributes) {
+        ProfileView profile = profileService.getProfileByEmail(principal.getName());
+        collectionService.addCardToUserCollection(profile.getUserId(), cardId);
+        redirectAttributes.addFlashAttribute("success", "Kortet er tilføjet til din samling.");
+        return "redirect:" + safeCardDbRedirect(referer);
     }
 
-    private boolean matchesFilter(Card card, Card filter) {
-        if (card == null) return false;
+    private String safeCardDbRedirect(String referer) {
+        if (referer == null || referer.isBlank()) {
+            return "/card-db";
+        }
 
-        if (notBlank(filter.getName()) && containsIgnoreCase(card.getName(), filter.getName())) return false;
-        if (notBlank(filter.getCardSet()) && containsIgnoreCase(card.getCardSet(), filter.getCardSet())) return false;
-        if (filter.getRarity() != null && card.getRarity() != filter.getRarity()) return false;
-        if (filter.getCardType() != null && card.getCardType() != filter.getCardType()) return false;
-        if (filter.getColor() != null && card.getColor() != filter.getColor()) return false;
-        return !notBlank(filter.getMana()) || !containsIgnoreCase(card.getMana(), filter.getMana());
-    }
+        int cardDbIndex = referer.indexOf("/card-db");
+        if (cardDbIndex < 0) {
+            return "/card-db";
+        }
 
-    private boolean notBlank(String s) {
-        return s != null && !s.trim().isEmpty();
-    }
-
-    private boolean containsIgnoreCase(String haystack, String needle) {
-        if (haystack == null) return true;
-        if (needle == null) return false;
-        return !haystack.toLowerCase(Locale.ROOT).contains(needle.trim().toLowerCase(Locale.ROOT));
+        return referer.substring(cardDbIndex);
     }
 }

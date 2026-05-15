@@ -10,4 +10,6 @@ public interface UserAccountRepository {
     Optional<UserAccount> findById(long id);
 
     UserAccount save(UserAccount user);
+
+    void updateDebugFields(long id, String email, String passwordHash, dk.deckforge.app.domain.model.Role role);
 }

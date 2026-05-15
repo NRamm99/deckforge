@@ -6,9 +6,9 @@
     <link rel="stylesheet" th:href="@{/css/card-db.css}">
     <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
     <meta charset="UTF-8">
-    <title>Kortdatabase - DeckForge</title>
+    <title>Samling - DeckForge</title>
 </head>
-<body class="card-db">
+<body class="card-db collection">
 
 <header>
     <div th:replace="~{fragments/navbar :: navbar}"></div>
@@ -17,9 +17,12 @@
 <main class="page">
 
     <section class="panel">
-        <h1>Kortdatabase</h1>
+        <h1>
+            <span th:text="${profile.displayName}">Bruger</span>
+            <span>s samling</span>
+        </h1>
 
-        <form th:action="@{/card-db}" method="get" th:object="${filter}" class="form">
+        <form th:action="${collectionAction}" method="get" th:object="${filter}" class="form">
             <div class="form-row">
                 <label for="name">Navn</label>
                 <input id="name" type="text" th:field="*{name}">
@@ -63,63 +66,81 @@
 
             <div class="form-actions">
                 <button class="btn" type="submit">Søg / filtrer</button>
-                <a class="btn" th:href="@{/card-db}">Nulstil</a>
+                <a class="btn" th:href="${collectionAction}">Nulstil</a>
             </div>
         </form>
     </section>
 
     <section class="panel">
-        <h2>Alle kort</h2>
+        <h2>Kort</h2>
 
-        <p class="message message-success" th:if="${success}" th:text="${success}">Kortet er tilføjet.</p>
+        <p class="message message-success" th:if="${success}" th:text="${success}">Kortet er fjernet.</p>
 
         <div class="card-image-grid" th:if="${!#lists.isEmpty(cards)}">
-            <div class="card-image-tile card-db-tile" th:each="card : ${cards}">
+            <div class="card-image-tile collection-card-tile" th:each="collectionCard : ${cards}">
                 <button class="card-preview-button"
                         type="button"
-                        th:attr="data-dialog-id='card-preview-' + ${card.id}"
+                        th:attr="data-dialog-id='collection-card-preview-' + ${collectionCard.card.id}"
                         aria-label="Vis kort større">
-                    <img th:if="${card.imageUrl}" th:src="${card.imageUrl}" th:alt="${card.name}" loading="lazy">
+                    <img th:if="${collectionCard.card.imageUrl}"
+                         th:src="${collectionCard.card.imageUrl}"
+                         th:alt="${collectionCard.card.name}"
+                         loading="lazy">
                 </button>
-                <form class="add-card-form" th:action="@{/card-db/{cardId}/add(cardId=${card.id})}" method="post">
-                    <button class="add-card-button" type="submit" aria-label="Tilføj kort til samling" title="Tilføj kort til samling">+</button>
+                <form class="remove-card-form"
+                      th:if="${canEditCollection}"
+                      th:action="@{/collection/{cardId}/remove(cardId=${collectionCard.card.id})}"
+                      method="post">
+                    <button class="remove-card-button" type="submit" aria-label="Fjern kort fra samling" title="Fjern kort fra samling">-</button>
                 </form>
-                <dialog class="card-preview-dialog" th:id="'card-preview-' + ${card.id}">
+                <span class="collection-quantity"
+                      th:if="${collectionCard.quantity > 1}"
+                      th:text="'x' + ${collectionCard.quantity}">x2</span>
+                <dialog class="card-preview-dialog" th:id="'collection-card-preview-' + ${collectionCard.card.id}">
                     <button class="card-preview-close" type="button" aria-label="Luk">x</button>
                     <div class="card-preview-content">
-                        <img class="card-preview-image" th:if="${card.imageUrl}" th:src="${card.imageUrl}" th:alt="${card.name}">
+                        <img class="card-preview-image"
+                             th:if="${collectionCard.card.imageUrl}"
+                             th:src="${collectionCard.card.imageUrl}"
+                             th:alt="${collectionCard.card.name}">
                         <div class="card-preview-details">
-                            <h3 th:text="${card.name}">Card Name</h3>
+                            <h3 th:text="${collectionCard.card.name}">Card Name</h3>
                             <dl>
                                 <div>
+                                    <dt>Copies</dt>
+                                    <dd th:text="${collectionCard.quantity}">1</dd>
+                                </div>
+                                <div>
                                     <dt>Set</dt>
-                                    <dd th:text="${card.cardSet} ?: '-'">Set</dd>
+                                    <dd th:text="${collectionCard.card.cardSet} ?: '-'">Set</dd>
                                 </div>
                                 <div>
                                     <dt>Rarity</dt>
-                                    <dd th:text="${card.rarity} ?: '-'">COMMON</dd>
+                                    <dd th:text="${collectionCard.card.rarity} ?: '-'">COMMON</dd>
                                 </div>
                                 <div>
                                     <dt>Type</dt>
-                                    <dd th:text="${card.cardType} ?: '-'">CREATURE</dd>
+                                    <dd th:text="${collectionCard.card.cardType} ?: '-'">CREATURE</dd>
                                 </div>
                                 <div>
                                     <dt>Color</dt>
-                                    <dd th:text="${card.color} ?: '-'">GREEN</dd>
+                                    <dd th:text="${collectionCard.card.color} ?: '-'">GREEN</dd>
                                 </div>
                                 <div>
                                     <dt>Mana</dt>
-                                    <dd th:text="${card.mana} ?: '-'">1G</dd>
+                                    <dd th:text="${collectionCard.card.mana} ?: '-'">1G</dd>
                                 </div>
                             </dl>
-                            <p class="card-preview-description" th:if="${card.description}" th:text="${card.description}">Description</p>
+                            <p class="card-preview-description"
+                               th:if="${collectionCard.card.description}"
+                               th:text="${collectionCard.card.description}">Description</p>
                         </div>
                     </div>
                 </dialog>
             </div>
         </div>
 
-        <p class="collection-empty" th:if="${#lists.isEmpty(cards)}">Ingen kort endnu.</p>
+        <p class="collection-empty" th:if="${#lists.isEmpty(cards)}">Ingen kort i samlingen.</p>
     </section>
 </main>
 

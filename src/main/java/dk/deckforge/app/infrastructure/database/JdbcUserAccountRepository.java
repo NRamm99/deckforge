@@ -90,6 +90,31 @@ public class JdbcUserAccountRepository implements UserAccountRepository {
         }
     }
 
+    @Override
+    public void updateDebugFields(long id, String email, String passwordHash, Role role) {
+        String sql = passwordHash == null || passwordHash.isBlank()
+                ? "UPDATE user_account SET email = ?, role = ? WHERE id = ?"
+                : "UPDATE user_account SET email = ?, password_hash = ?, role = ? WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            if (passwordHash == null || passwordHash.isBlank()) {
+                ps.setString(2, role.name());
+                ps.setLong(3, id);
+            } else {
+                ps.setString(2, passwordHash);
+                ps.setString(3, role.name());
+                ps.setLong(4, id);
+            }
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating debug user fields", e);
+        }
+    }
+
     private UserAccount mapRow(ResultSet rs) throws SQLException {
         UserAccount user = new UserAccount();
 

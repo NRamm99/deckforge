@@ -328,6 +328,289 @@ p {
     font-size: 16px;
 }
 
+.debug-profile-card h1,
+.debug-profile-card p {
+    width: auto;
+    margin: 0;
+    display: block;
+    text-align: left;
+}
+
+.debug-profile-form {
+    display: grid;
+    gap: 18px;
+}
+
+.debug-profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.debug-profile-form select {
+    height: 44px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    background-color: #0f172a;
+    color: whitesmoke;
+    font-size: 16px;
+}
+
+.debug-profile-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.debug-profile-actions .btn {
+    margin: 0;
+}
+
+.debug-message {
+    width: auto;
+    margin: 0;
+    padding: 10px 12px;
+    display: block;
+    color: whitesmoke;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.debug-message-success {
+    background: rgba(39, 174, 96, 0.18);
+    border: 1px solid rgba(39, 174, 96, 0.35);
+}
+
+.debug-message-error {
+    background: rgba(239, 68, 68, 0.16);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.error-card {
+    margin: 90px auto 0;
+    width: min(680px, calc(100% - 32px));
+    padding: 42px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background-color: #3e465c;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2),
+    0 6px 20px rgba(0,0,0,0.19);
+    border-radius: 10px;
+    color: whitesmoke;
+}
+
+.error-card h1,
+.error-card p {
+    width: auto;
+    margin: 0;
+    display: block;
+    text-align: left;
+}
+
+.error-card h1 {
+    font-size: 42px;
+}
+
+.error-card p {
+    color: #dbe4ef;
+    line-height: 1.45;
+}
+
+.error-code {
+    width: max-content;
+    padding: 7px 11px;
+    background: #0f172a;
+    border: 1px solid rgba(39, 174, 96, 0.75);
+    border-radius: 8px;
+    color: #dbe4ef;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.error-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.error-actions .btn {
+    margin: 0;
+}
+
+.decks-card {
+    width: min(900px, calc(100% - 32px));
+}
+
+.decks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.decks-header h1,
+.decks-card h1 {
+    width: auto;
+    margin: 0;
+    display: block;
+    text-align: left;
+    font-size: 42px;
+}
+
+.decks-header p,
+.decks-empty {
+    width: auto;
+    margin: 8px 0 0;
+    display: block;
+    text-align: left;
+    color: #dbe4ef;
+}
+
+.decks-list {
+    display: grid;
+    gap: 14px;
+}
+
+.deck-list-item {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    gap: 18px;
+    align-items: center;
+    background-color: #0f172a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+}
+
+.deck-list-item h2 {
+    margin: 0 0 6px;
+    color: whitesmoke;
+    font-size: 22px;
+    overflow-wrap: anywhere;
+}
+
+.deck-list-meta {
+    display: grid;
+    gap: 4px;
+}
+
+.deck-list-item span {
+    display: block;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.deck-list-item dl {
+    margin: 0;
+    display: flex;
+    gap: 14px;
+}
+
+.deck-list-item dl div {
+    min-width: 90px;
+}
+
+.deck-list-item dt {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.deck-list-item dd {
+    margin: 4px 0 0;
+    color: whitesmoke;
+    font-size: 16px;
+}
+
+.deck-view-btn {
+    margin: 0;
+    width: 90px;
+    height: 42px;
+    border-radius: 10px;
+}
+
+.deck-view-btn:hover {
+    width: 90px;
+    height: 42px;
+    font-size: 16px;
+}
+
+.deck-delete-btn {
+    margin: 0;
+    width: 90px;
+    height: 42px;
+    border-radius: 10px;
+    background-color: #b91c1c;
+}
+
+.deck-delete-btn:hover {
+    width: 90px;
+    height: 42px;
+    background-color: #dc2626;
+    font-size: 16px;
+}
+
+.deck-back-btn {
+    margin: 0;
+}
+
+.deck-back-btn:hover {
+    font-size: 16px;
+}
+
+.deck-view-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.decks-message {
+    width: auto;
+    margin: 0;
+    padding: 10px 12px;
+    display: block;
+    color: whitesmoke;
+    background: rgba(39, 174, 96, 0.18);
+    border: 1px solid rgba(39, 174, 96, 0.35);
+    border-radius: 8px;
+    text-align: left;
+}
+
+.deck-view-summary {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.deck-view-summary div {
+    padding: 14px;
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+}
+
+.deck-view-summary dt {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.deck-view-summary dd {
+    margin: 5px 0 0;
+    color: whitesmoke;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
 @media (max-width: 640px) {
     .profile-card {
         padding: 28px;

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class CardService {
@@ -18,6 +20,16 @@ public class CardService {
 
     public List<Card> getAllCards() {
         return cardRepository.findAll();
+    }
+
+    public List<Card> filterCards(List<Card> cards, Card filter) {
+        if (cards == null || filter == null || !hasAnyFilter(filter)) {
+            return cards;
+        }
+
+        return cards.stream()
+                .filter(c -> matchesFilter(c, filter))
+                .collect(Collectors.toList());
     }
 
     public Card getCard(long id) {
@@ -46,5 +58,35 @@ public class CardService {
         }
 
         cardRepository.save(card);
+    }
+
+    private boolean hasAnyFilter(Card filter) {
+        return notBlank(filter.getName())
+                || notBlank(filter.getCardSet())
+                || filter.getRarity() != null
+                || filter.getCardType() != null
+                || filter.getColor() != null
+                || notBlank(filter.getMana());
+    }
+
+    private boolean matchesFilter(Card card, Card filter) {
+        if (card == null) return false;
+
+        if (notBlank(filter.getName()) && doesNotContainIgnoreCase(card.getName(), filter.getName())) return false;
+        if (notBlank(filter.getCardSet()) && doesNotContainIgnoreCase(card.getCardSet(), filter.getCardSet())) return false;
+        if (filter.getRarity() != null && card.getRarity() != filter.getRarity()) return false;
+        if (filter.getCardType() != null && card.getCardType() != filter.getCardType()) return false;
+        if (filter.getColor() != null && card.getColor() != filter.getColor()) return false;
+        return !notBlank(filter.getMana()) || !doesNotContainIgnoreCase(card.getMana(), filter.getMana());
+    }
+
+    private boolean notBlank(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+
+    private boolean doesNotContainIgnoreCase(String haystack, String needle) {
+        if (haystack == null) return true;
+        if (needle == null) return false;
+        return !haystack.toLowerCase(Locale.ROOT).contains(needle.trim().toLowerCase(Locale.ROOT));
     }
 }
