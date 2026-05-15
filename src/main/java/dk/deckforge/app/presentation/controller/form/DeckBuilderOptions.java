@@ -1,4 +1,4 @@
-package dk.deckforge.app.application.dto;
+package dk.deckforge.app.presentation.controller.form;
 
 public record DeckBuilderOptions(Boolean conceptDeck) {
 

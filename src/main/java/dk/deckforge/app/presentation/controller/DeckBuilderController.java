@@ -1,13 +1,14 @@
 package dk.deckforge.app.presentation.controller;
 
+import dk.deckforge.app.application.command.CreateDeckCommand;
 import dk.deckforge.app.application.dto.DeckBuilderCardView;
-import dk.deckforge.app.application.dto.DeckBuilderOptions;
-import dk.deckforge.app.application.dto.DeckSaveRequest;
 import dk.deckforge.app.application.dto.ProfileView;
 import dk.deckforge.app.application.service.CardService;
 import dk.deckforge.app.application.service.CollectionService;
 import dk.deckforge.app.application.service.DeckService;
 import dk.deckforge.app.application.service.ProfileService;
+import dk.deckforge.app.presentation.controller.form.DeckBuilderOptions;
+import dk.deckforge.app.presentation.controller.form.DeckSaveRequest;
 import dk.deckforge.app.domain.model.Card;
 import dk.deckforge.app.domain.model.CardColor;
 import dk.deckforge.app.domain.model.CardRarity;
@@ -132,14 +133,14 @@ public class DeckBuilderController {
         ProfileView profile = profileService.getProfileByEmail(principal.getName());
 
         try {
-            deckService.saveDeck(
+            deckService.saveDeck(new CreateDeckCommand(
                     profile.getUserId(),
                     request.deckName(),
                     request.format(),
                     request.isConceptDeck(),
                     request.effectiveVisibility(),
                     deckCards
-            );
+            ));
             deckCards.clear();
             redirectAttributes.addFlashAttribute("success", "Decket er gemt.");
         } catch (IllegalArgumentException ex) {

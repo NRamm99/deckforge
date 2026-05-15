@@ -3,13 +3,13 @@ package dk.deckforge.app.application.service;
 import dk.deckforge.app.application.dto.AuthResponse;
 import dk.deckforge.app.application.dto.LoginRequest;
 import dk.deckforge.app.application.dto.RegisterRequest;
+import dk.deckforge.app.application.port.PasswordHasher;
 import dk.deckforge.app.domain.model.PlayerProfile;
 import dk.deckforge.app.domain.model.Role;
 import dk.deckforge.app.domain.model.UserAccount;
 import dk.deckforge.app.domain.model.Visibility;
 import dk.deckforge.app.domain.repository.PlayerProfileRepository;
 import dk.deckforge.app.domain.repository.UserAccountRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +18,14 @@ public class AuthService {
 
     private final UserAccountRepository userAccountRepository;
     private final PlayerProfileRepository playerProfileRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordHasher passwordHasher;
 
     public AuthService(UserAccountRepository userAccountRepository,
                        PlayerProfileRepository playerProfileRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordHasher passwordHasher) {
         this.userAccountRepository = userAccountRepository;
         this.playerProfileRepository = playerProfileRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordHasher = passwordHasher;
     }
 
     @Transactional
@@ -37,7 +37,7 @@ public class AuthService {
 
         UserAccount user = new UserAccount();
         user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setPasswordHash(passwordHasher.hash(request.getPassword()));
         user.setRole(Role.USER);
         user.setActive(true);
 
@@ -57,7 +57,7 @@ public class AuthService {
         UserAccount user = userAccountRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (!passwordHasher.matches(request.getPassword(), user.getPasswordHash())) {
             throw new IllegalArgumentException("Invalid password");
         }
 

@@ -1,6 +1,7 @@
 package dk.deckforge.app.domain.repository;
 
 import dk.deckforge.app.domain.model.UserAccount;
+import dk.deckforge.app.domain.model.Role;
 
 import java.util.Optional;
 
@@ -11,5 +12,5 @@ public interface UserAccountRepository {
 
     UserAccount save(UserAccount user);
 
-    void updateDebugFields(long id, String email, String passwordHash, dk.deckforge.app.domain.model.Role role);
+    void updateAccount(long id, String email, String passwordHash, Role role);
 }

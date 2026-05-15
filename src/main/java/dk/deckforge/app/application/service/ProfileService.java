@@ -1,13 +1,14 @@
 package dk.deckforge.app.application.service;
 
+import dk.deckforge.app.application.command.UpdateDebugProfileCommand;
 import dk.deckforge.app.application.dto.ProfileView;
+import dk.deckforge.app.application.port.PasswordHasher;
 import dk.deckforge.app.domain.model.PlayerProfile;
 import dk.deckforge.app.domain.model.Role;
 import dk.deckforge.app.domain.model.UserAccount;
 import dk.deckforge.app.domain.model.Visibility;
 import dk.deckforge.app.domain.repository.PlayerProfileRepository;
 import dk.deckforge.app.domain.repository.UserAccountRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +17,14 @@ public class ProfileService {
 
     private final UserAccountRepository userAccountRepository;
     private final PlayerProfileRepository playerProfileRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordHasher passwordHasher;
 
     public ProfileService(UserAccountRepository userAccountRepository,
                           PlayerProfileRepository playerProfileRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordHasher passwordHasher) {
         this.userAccountRepository = userAccountRepository;
         this.playerProfileRepository = playerProfileRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordHasher = passwordHasher;
     }
 
     public ProfileView getProfileByEmail(String email) {
@@ -41,21 +42,16 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileView updateDebugProfile(String currentEmail,
-                                          String email,
-                                          String displayName,
-                                          String password,
-                                          Role role,
-                                          Visibility collectionVisibility) {
-        UserAccount user = userAccountRepository.findByEmail(currentEmail)
+    public ProfileView updateDebugProfile(UpdateDebugProfileCommand command) {
+        UserAccount user = userAccountRepository.findByEmail(command.currentEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        String normalizedEmail = requireText(email, "Email is required");
-        String normalizedDisplayName = requireText(displayName, "Name is required");
-        if (role == null) {
+        String normalizedEmail = requireText(command.email(), "Email is required");
+        String normalizedDisplayName = requireText(command.displayName(), "Name is required");
+        if (command.role() == null) {
             throw new IllegalArgumentException("Role is required");
         }
-        if (collectionVisibility == null) {
+        if (command.collectionVisibility() == null) {
             throw new IllegalArgumentException("Visibility is required");
         }
 
@@ -65,9 +61,9 @@ public class ProfileService {
                     throw new IllegalArgumentException("Email already in use");
                 });
 
-        String passwordHash = password == null || password.isBlank() ? null : passwordEncoder.encode(password);
-        userAccountRepository.updateDebugFields(user.getId(), normalizedEmail, passwordHash, role);
-        playerProfileRepository.updateDebugFields(user.getId(), normalizedDisplayName, collectionVisibility);
+        String passwordHash = command.password() == null || command.password().isBlank() ? null : passwordHasher.hash(command.password());
+        userAccountRepository.updateAccount(user.getId(), normalizedEmail, passwordHash, command.role());
+        playerProfileRepository.updateProfile(user.getId(), normalizedDisplayName, command.collectionVisibility());
 
         return getProfileByUserId(user.getId());
     }

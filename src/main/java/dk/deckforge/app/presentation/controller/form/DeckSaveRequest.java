@@ -1,4 +1,4 @@
-package dk.deckforge.app.application.dto;
+package dk.deckforge.app.presentation.controller.form;
 
 import dk.deckforge.app.domain.model.DeckFormat;
 import dk.deckforge.app.domain.model.Visibility;

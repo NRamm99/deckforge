@@ -1,10 +1,11 @@
 package dk.deckforge.app.presentation.controller;
 
-import dk.deckforge.app.application.dto.ProfileDebugRequest;
+import dk.deckforge.app.application.command.UpdateDebugProfileCommand;
 import dk.deckforge.app.application.dto.ProfileView;
 import dk.deckforge.app.application.service.ProfileService;
 import dk.deckforge.app.domain.model.Role;
 import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.presentation.controller.form.ProfileDebugRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,14 +51,14 @@ public class ProfileController {
                                      Principal principal,
                                      RedirectAttributes redirectAttributes) {
         try {
-            ProfileView updatedProfile = profileService.updateDebugProfile(
+            ProfileView updatedProfile = profileService.updateDebugProfile(new UpdateDebugProfileCommand(
                     principal.getName(),
                     request.email(),
                     request.displayName(),
                     request.password(),
                     request.role(),
                     request.collectionVisibility()
-            );
+            ));
             refreshAuthentication(updatedProfile.getEmail());
             redirectAttributes.addFlashAttribute("success", "Debug-profilen er gemt.");
         } catch (IllegalArgumentException ex) {

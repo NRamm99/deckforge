@@ -1,6 +1,7 @@
 package dk.deckforge.app.domain.repository;
 
 import dk.deckforge.app.domain.model.PlayerProfile;
+import dk.deckforge.app.domain.model.Visibility;
 
 import java.util.Optional;
 
@@ -9,5 +10,5 @@ public interface PlayerProfileRepository {
 
     PlayerProfile save(PlayerProfile profile);
 
-    void updateDebugFields(long userAccountId, String displayName, dk.deckforge.app.domain.model.Visibility collectionVisibility);
+    void updateProfile(long userAccountId, String displayName, Visibility collectionVisibility);
 }

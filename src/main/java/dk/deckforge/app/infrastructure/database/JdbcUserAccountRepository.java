@@ -91,7 +91,7 @@ public class JdbcUserAccountRepository implements UserAccountRepository {
     }
 
     @Override
-    public void updateDebugFields(long id, String email, String passwordHash, Role role) {
+    public void updateAccount(long id, String email, String passwordHash, Role role) {
         String sql = passwordHash == null || passwordHash.isBlank()
                 ? "UPDATE user_account SET email = ?, role = ? WHERE id = ?"
                 : "UPDATE user_account SET email = ?, password_hash = ?, role = ? WHERE id = ?";
@@ -111,7 +111,7 @@ public class JdbcUserAccountRepository implements UserAccountRepository {
 
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error updating debug user fields", e);
+            throw new RuntimeException("Error updating user account", e);
         }
     }
 

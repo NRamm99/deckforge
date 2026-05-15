@@ -72,7 +72,7 @@ public class JdbcPlayerProfileRepository implements PlayerProfileRepository {
     }
 
     @Override
-    public void updateDebugFields(long userAccountId, String displayName, Visibility collectionVisibility) {
+    public void updateProfile(long userAccountId, String displayName, Visibility collectionVisibility) {
         String sql = """
                 UPDATE player_profile
                 SET display_name = ?, collection_visibility = ?
@@ -87,7 +87,7 @@ public class JdbcPlayerProfileRepository implements PlayerProfileRepository {
             ps.setLong(3, userAccountId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error updating debug profile fields", e);
+            throw new RuntimeException("Error updating player profile", e);
         }
     }
 

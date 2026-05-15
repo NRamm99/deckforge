@@ -1,5 +1,6 @@
 package dk.deckforge.app.application.service;
 
+import dk.deckforge.app.application.command.CreateDeckCommand;
 import dk.deckforge.app.domain.model.Deck;
 import dk.deckforge.app.domain.model.DeckFormat;
 import dk.deckforge.app.domain.model.CollectionCard;
@@ -24,11 +25,17 @@ public class DeckService {
     }
 
     @Transactional
-    public Deck saveDeck(long userAccountId, String name, DeckFormat format, boolean conceptDeck, Visibility visibility, Map<Long, Integer> cardQuantities) {
-        validateDeck(userAccountId, name, format, conceptDeck, cardQuantities);
+    public Deck saveDeck(CreateDeckCommand command) {
+        validateDeck(command.userAccountId(), command.name(), command.format(), command.conceptDeck(), command.cardQuantities());
 
-        Deck deck = new Deck(userAccountId, name.trim(), format, conceptDeck, visibility == null ? Visibility.PUBLIC : visibility);
-        return deckRepository.save(deck, cardQuantities);
+        Deck deck = new Deck(
+                command.userAccountId(),
+                command.name().trim(),
+                command.format(),
+                command.conceptDeck(),
+                command.visibility() == null ? Visibility.PUBLIC : command.visibility()
+        );
+        return deckRepository.save(deck, command.cardQuantities());
     }
 
     public List<Deck> getDecksForUser(long userAccountId) {
