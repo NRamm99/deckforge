@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/events.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Event - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card decks-card">
+
+        <div class="decks-header">
+            <div>
+                <h1 th:text="${event.title}">Eventnavn</h1>
+                <p th:text="${event.location}">Sted</p>
+            </div>
+
+            <a th:if="${admin}" th:href="@{/events/{id}/result(id=${event.id})}" class="btn profile-btn">
+                Registrer resultat
+            </a>
+        </div>
+
+        <p class="event-decks-message" th:if="${success}" th:text="${success}">Success</p>
+        <p class="event-decks-message" th:if="${error}" th:text="${error}">Fejl</p>
+
+        <section class="profile-details">
+            <div class="profile-detail">
+                <span class="profile-detail-label">Dato</span>
+                <span class="profile-detail-value" th:text="${#temporals.format(event.dateTime, 'yyyy-MM-dd')}">Dato</span>
+            </div>
+
+            <div class="profile-detail">
+                <span class="profile-detail-label">Tidspunkt</span>
+                <span class="profile-detail-value" th:text="${#temporals.format(event.dateTime, 'HH:mm')}">Tidspunkt</span>
+            </div>
+
+            <div class="profile-detail">
+                <span class="profile-detail-label">Format</span>
+                <span class="profile-detail-value" th:text="${event.format}">STANDARD</span>
+            </div>
+
+            <div class="profile-detail">
+                <span class="profile-detail-label">Status</span>
+                <span class="profile-detail-value" th:text="${event.status}">OPEN</span>
+            </div>
+
+            <div class="profile-detail">
+                <span class="profile-detail-label">Deltagere</span>
+                <span class="profile-detail-value"
+                      th:text="${event.registeredCount} + ' / ' + ${event.maxParticipants}">
+                    0 / 8
+                </span>
+            </div>
+        </section>
+
+        <div class="profile-actions">
+            <form th:if="${!currentUserRegistered && event.status.name() == 'OPEN' && !event.full}"
+                  th:action="@{/events/{id}/register(id=${event.id})}"
+                  method="post">
+                <button class="btn profile-btn" type="submit">Tilmeld</button>
+            </form>
+
+            <form th:if="${currentUserRegistered && event.status.name() == 'OPEN'}"
+                  th:action="@{/events/{id}/cancel-registration(id=${event.id})}"
+                  method="post">
+                <button class="btn profile-btn" type="submit">Afmeld</button>
+            </form>
+
+            <a class="btn profile-btn" th:href="@{/events}">Tilbage til events</a>
+        </div>
+
+        <section class="decks-list">
+            <h2>Deltagerliste</h2>
+
+            <article class="deck-list-item" th:each="registration : ${registrations}">
+                <div>
+                    <h3 th:text="${registration.displayName}">Spillernavn</h3>
+                    <div class="deck-list-meta" th:if="${admin}">
+                        <span th:text="${registration.email}">email@email.dk</span>
+                        <span th:text="'Tilmeldt: ' + ${#temporals.format(registration.registeredAt, 'yyyy-MM-dd HH:mm')}">Tilmeldt</span>
+                    </div>
+                </div>
+            </article>
+
+            <p class="decks-empty" th:if="${#lists.isEmpty(registrations)}">Ingen deltagere endnu.</p>
+        </section>
+
+        <section class="profile-details" th:if="${result != null}">
+            <div class="profile-detail">
+                <span class="profile-detail-label">Vinder</span>
+                <span class="profile-detail-value" th:text="${result.winnerDisplayName}">Vinder</span>
+            </div>
+        </section>
+
+    </section>
+</main>
+
+</body>
+</html>

@@ -72,3 +72,48 @@ CREATE TABLE IF NOT EXISTS player_deck_card (
         REFERENCES card(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS deckforge_event (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    date_time DATETIME NOT NULL,
+    format VARCHAR(50) NOT NULL,
+    max_participants INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    organizer_user_account_id BIGINT NOT NULL,
+    CONSTRAINT fk_event_organizer_user_account
+        FOREIGN KEY (organizer_user_account_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE
+    );
+
+CREATE TABLE IF NOT EXISTS event_registration (
+    event_id BIGINT NOT NULL,
+    user_account_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    registered_at DATETIME NOT NULL,
+    PRIMARY KEY (event_id, user_account_id),
+    CONSTRAINT fk_event_registration_event
+        FOREIGN KEY (event_id)
+        REFERENCES deckforge_event(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_event_registration_user_account
+        FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE
+    );
+
+CREATE TABLE IF NOT EXISTS event_result (
+event_id BIGINT PRIMARY KEY,
+    winner_user_account_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    CONSTRAINT fk_event_result_event
+        FOREIGN KEY (event_id)
+        REFERENCES deckforge_event(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_event_result_winner_user_account
+        FOREIGN KEY (winner_user_account_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE
+    );

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/events.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Opret event - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card">
+        <h1>Opret event</h1>
+        <p>Udfyld de vigtigste oplysninger for eventet.</p>
+
+        <p class="event-decks-message" th:if="${error}" th:text="${error}">Fejl</p>
+
+        <form th:action="@{/events/create}" method="post" class="event-form">
+
+            <div class="event-form-row">
+                <label for="title">Titel</label>
+                <input id="title" name="title" type="text" required>
+            </div>
+
+            <div class="event-form-row">
+                <label for="location">Sted / butik</label>
+                <input id="location" name="location" type="text" required>
+            </div>
+
+            <div class="event-form-row">
+                <label for="dateTime">Dato og tidspunkt</label>
+                <input id="dateTime" name="dateTime" type="datetime-local" required>
+            </div>
+
+            <div class="event-form-row">
+                <label for="format">Format</label>
+                <select id="format" name="format" required>
+                    <option value="">Vælg format</option>
+                    <option th:each="format : ${formats}"
+                            th:value="${format}"
+                            th:text="${format}">
+                        STANDARD
+                    </option>
+                </select>
+            </div>
+
+            <div class="event-form-row">
+                <label for="maxParticipants">Maks deltagere</label>
+                <input id="maxParticipants" name="maxParticipants" type="number" min="1" required>
+            </div>
+
+            <div class="profile-actions">
+                <button class="btn profile-btn" type="submit">Opret event</button>
+                <a class="btn profile-btn" th:href="@{/events}">Tilbage</a>
+            </div>
+
+        </form>
+    </section>
+</main>
+
+</body>
+</html>
