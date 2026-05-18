@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Opret Trade - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card">
+        <h1>Opret trade</h1>
+        <p>Vælg et kort fra din samling at tilbyde.</p>
+
+        <p th:if="${error}" th:text="${error}"></p>
+
+        <form th:action="@{/trades/new}" method="post">
+            <div id="rows" style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+                <div class="trade-row" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+                    <div>
+                        <label>Kort</label><br>
+                        <select name="cardIds" required>
+                            <option value="" selected disabled>Vælg kort</option>
+                            <option th:each="cc : ${collectionCards}"
+                                    th:value="${cc.card.id}"
+                                    th:text="${cc.card.name} + ' (du har ' + ${cc.quantity} + ')'">
+                                Card
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Antal</label><br>
+                        <input name="quantities" type="number" min="1" value="1" style="width:90px;">
+                    </div>
+
+                    <button class="btn deck-delete-btn remove-row" type="button">Fjern</button>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+                <button id="addRow" class="btn deck-view-btn" type="button">Tilføj række</button>
+                <button type="submit" class="btn profile-btn">Opret</button>
+                <a class="btn deck-view-btn" th:href="@{/trades}">Tilbage</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    (function () {
+        const rows = document.getElementById('rows');
+        const addRowBtn = document.getElementById('addRow');
+
+        function wireRow(row) {
+            const remove = row.querySelector('.remove-row');
+            remove.addEventListener('click', function () {
+                if (rows.children.length <= 1) return;
+                row.remove();
+            });
+        }
+
+        function addRow() {
+            const first = rows.querySelector('.trade-row');
+            const clone = first.cloneNode(true);
+            clone.querySelector('select[name="cardIds"]').selectedIndex = 0;
+            clone.querySelector('input[name="quantities"]').value = 1;
+            rows.appendChild(clone);
+            wireRow(clone);
+        }
+
+        wireRow(rows.querySelector('.trade-row'));
+        addRowBtn.addEventListener('click', addRow);
+    })();
+</script>
+
+</body>
+</html>

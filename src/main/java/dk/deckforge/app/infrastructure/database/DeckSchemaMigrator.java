@@ -1,6 +1,7 @@
 package dk.deckforge.app.infrastructure.database;
 
-import jakarta.annotation.PostConstruct;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @Component
-public class DeckSchemaMigrator {
+public class DeckSchemaMigrator implements ApplicationRunner {
 
     private final DataSource dataSource;
 
@@ -18,9 +19,17 @@ public class DeckSchemaMigrator {
         this.dataSource = dataSource;
     }
 
-    @PostConstruct
+    @Override
+    public void run(ApplicationArguments args) {
+        addDeckVisibilityColumnIfMissing();
+    }
+
     public void addDeckVisibilityColumnIfMissing() {
         try (Connection conn = dataSource.getConnection()) {
+            if (!hasTable(conn, "player_deck")) {
+                // Schema init (schema.sql) may not have run yet or DB is empty; avoid failing app startup.
+                return;
+            }
             if (hasColumn(conn, "player_deck", "visibility")) {
                 return;
             }
@@ -30,6 +39,17 @@ public class DeckSchemaMigrator {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error migrating deck visibility column", e);
+        }
+    }
+
+    private boolean hasTable(Connection conn, String tableName) throws SQLException {
+        try (ResultSet rs = conn.getMetaData().getTables(null, null, tableName, null)) {
+            if (rs.next()) {
+                return true;
+            }
+        }
+        try (ResultSet rs = conn.getMetaData().getTables(null, null, tableName.toUpperCase(), null)) {
+            return rs.next();
         }
     }
 

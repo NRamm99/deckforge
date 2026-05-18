@@ -72,3 +72,54 @@ CREATE TABLE IF NOT EXISTS player_deck_card (
         REFERENCES card(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS trade (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    creator_user_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS trade_card (
+    trade_id BIGINT NOT NULL,
+    card_id BIGINT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (trade_id, card_id),
+    CONSTRAINT fk_trade_card_trade
+        FOREIGN KEY (trade_id)
+        REFERENCES trade(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_trade_card_card
+        FOREIGN KEY (card_id)
+        REFERENCES card(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS trade_offer (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    trade_id BIGINT NOT NULL,
+    offer_user_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_trade_offer_trade
+        FOREIGN KEY (trade_id)
+        REFERENCES trade(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_trade_offer_user_account
+        FOREIGN KEY (offer_user_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS trade_offer_card (
+    trade_offer_id BIGINT NOT NULL,
+    card_id BIGINT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (trade_offer_id, card_id),
+    CONSTRAINT fk_trade_offer_card_offer
+        FOREIGN KEY (trade_offer_id)
+        REFERENCES trade_offer(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_trade_offer_card_card
+        FOREIGN KEY (card_id)
+        REFERENCES card(id)
+        ON DELETE CASCADE
+);

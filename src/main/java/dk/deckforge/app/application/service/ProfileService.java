@@ -6,7 +6,6 @@ import dk.deckforge.app.application.port.PasswordHasher;
 import dk.deckforge.app.domain.model.PlayerProfile;
 import dk.deckforge.app.domain.model.Role;
 import dk.deckforge.app.domain.model.UserAccount;
-import dk.deckforge.app.domain.model.Visibility;
 import dk.deckforge.app.domain.repository.PlayerProfileRepository;
 import dk.deckforge.app.domain.repository.UserAccountRepository;
 import org.springframework.stereotype.Service;

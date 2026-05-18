@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Byttemarked - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="profile-card">
+        <div style="display:flex; justify-content:space-between; gap:16px; align-items:flex-start;">
+            <div>
+                <h1>Byttemarked</h1>
+                <p>Åbne trades</p>
+                <p th:if="${success}" th:text="${success}"></p>
+                <p th:if="${error}" th:text="${error}"></p>
+            </div>
+            <a th:href="@{/trades/new}" class="btn profile-btn">Opret trade</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(trades)}">
+            <p>Ingen åbne trades endnu.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(trades)}">
+            <article th:each="trade : ${trades}" style="border-top: 1px solid rgba(255,255,255,0.08); padding: 12px 0;">
+                <div style="display:flex; justify-content:space-between; gap:16px;">
+                    <div>
+                        <h2 th:text="'Trade #' + ${trade.id}">Trade #1</h2>
+                        <div style="opacity:0.85;">
+                            <span th:text="'Oprettet af user #' + ${trade.creatorUserId}">Oprettet af user #1</span>
+                            <span th:text="' | Status: ' + ${trade.status}"> | Status: OPEN</span>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <strong>Tilbyder:</strong>
+                            <span th:each="cc,iter : ${trade.offeredCards}"
+                                  th:text="${cc.quantity} + 'x ' + ${cc.card.name} + (${iter.last} ? '' : ', ')">1x Card</span>
+                        </div>
+                    </div>
+                    <a class="btn deck-view-btn" th:href="@{/trades/{id}(id=${trade.id})}">Se</a>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
+

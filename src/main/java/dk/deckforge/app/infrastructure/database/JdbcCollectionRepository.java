@@ -7,6 +7,7 @@ import dk.deckforge.app.domain.model.CardRarity;
 import dk.deckforge.app.domain.model.CardType;
 import dk.deckforge.app.domain.repository.CollectionRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,9 +21,11 @@ import java.util.List;
 public class JdbcCollectionRepository implements CollectionRepository {
 
     private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
     public JdbcCollectionRepository(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
@@ -100,6 +103,56 @@ public class JdbcCollectionRepository implements CollectionRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error removing card from player collection", e);
         }
+    }
+
+    @Override
+    public void requireSufficientQuantityForUpdate(long userAccountId, long cardId, int requiredQuantity) {
+        if (requiredQuantity <= 0) {
+            throw new IllegalArgumentException("requiredQuantity must be positive");
+        }
+
+        String sql = "SELECT quantity FROM player_collection_card WHERE user_account_id = ? AND card_id = ? FOR UPDATE";
+        Integer have = jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("quantity") : 0, userAccountId, cardId);
+        if (have == null) {
+            have = 0;
+        }
+        if (have < requiredQuantity) {
+            throw new IllegalStateException("User " + userAccountId + " does not have enough of card " + cardId);
+        }
+    }
+
+    @Override
+    public void incrementCardQuantity(long userAccountId, long cardId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("quantity must be positive");
+        }
+
+        String sql = """
+                INSERT INTO player_collection_card (user_account_id, card_id, quantity)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+                """;
+        jdbcTemplate.update(sql, userAccountId, cardId, quantity);
+    }
+
+    @Override
+    public void decrementCardQuantity(long userAccountId, long cardId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("quantity must be positive");
+        }
+
+        String updateSql = """
+                UPDATE player_collection_card
+                SET quantity = quantity - ?
+                WHERE user_account_id = ? AND card_id = ?
+                """;
+        jdbcTemplate.update(updateSql, quantity, userAccountId, cardId);
+
+        String cleanupSql = """
+                DELETE FROM player_collection_card
+                WHERE user_account_id = ? AND card_id = ? AND quantity <= 0
+                """;
+        jdbcTemplate.update(cleanupSql, userAccountId, cardId);
     }
 
     private Card mapRow(ResultSet rs) throws SQLException {

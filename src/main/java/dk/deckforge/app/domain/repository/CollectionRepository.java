@@ -10,4 +10,10 @@ public interface CollectionRepository {
     void addCardToUserCollection(long userAccountId, long cardId);
 
     void removeCardFromUserCollection(long userAccountId, long cardId);
+
+    void requireSufficientQuantityForUpdate(long userAccountId, long cardId, int requiredQuantity);
+
+    void incrementCardQuantity(long userAccountId, long cardId, int quantity);
+
+    void decrementCardQuantity(long userAccountId, long cardId, int quantity);
 }
