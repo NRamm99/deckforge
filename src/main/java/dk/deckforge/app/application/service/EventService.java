@@ -8,6 +8,7 @@ import dk.deckforge.app.domain.model.EventRegistration;
 import dk.deckforge.app.domain.model.EventRegistrationStatus;
 import dk.deckforge.app.domain.model.EventResult;
 import dk.deckforge.app.domain.model.EventStatus;
+import dk.deckforge.app.domain.model.Deck;
 import dk.deckforge.app.domain.repository.EventRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +22,11 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final DeckService deckService;
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, DeckService deckService) {
         this.eventRepository = eventRepository;
+        this.deckService = deckService;
     }
 
     @Transactional
@@ -69,7 +72,7 @@ public class EventService {
     }
 
     @Transactional
-    public void registerForEvent(long eventId, long userAccountId) {
+    public void registerForEvent(long eventId, long userAccountId, Long deckId) {
         Event event = getEvent(eventId);
 
         if (event.getStatus() != EventStatus.OPEN) {
@@ -85,7 +88,17 @@ public class EventService {
             throw new IllegalArgumentException("Eventet er fuldt.");
         }
 
-        eventRepository.saveOrReactivateRegistration(eventId, userAccountId);
+        if (deckId == null || deckId <= 0) {
+            throw new IllegalArgumentException("Du skal vælge et deck for at tilmelde dig.");
+        }
+
+        Deck deck = deckService.getDeckForUser(userAccountId, deckId);
+
+        if (deck.getFormat() != event.getFormat()) {
+            throw new IllegalArgumentException("Decket skal matche eventets format.");
+        }
+
+        eventRepository.saveOrReactivateRegistration(eventId, userAccountId, deckId);
     }
 
     @Transactional

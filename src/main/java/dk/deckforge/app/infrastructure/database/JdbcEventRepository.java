@@ -142,18 +142,21 @@ public class JdbcEventRepository implements EventRepository {
     @Override
     public List<EventRegistration> findRegistrationsByEventId(long eventId) {
         String sql = """
-                SELECT er.event_id,
-                       er.user_account_id,
-                       er.status,
-                       er.registered_at,
-                       pp.display_name,
-                       ua.email
-                FROM event_registration er
-                JOIN user_account ua ON ua.id = er.user_account_id
-                JOIN player_profile pp ON pp.user_account_id = ua.id
-                WHERE er.event_id = ?
-                  AND er.status = 'REGISTERED'
-                ORDER BY er.registered_at ASC
+                SELECT registration.event_id,
+                       registration.user_account_id,
+                       registration.deck_id,
+                       registration.status,
+                       registration.registered_at,
+                       profile.display_name,
+                       account.email,
+                       deck.name AS deck_name
+                FROM event_registration registration
+                JOIN user_account account ON account.id = registration.user_account_id
+                JOIN player_profile profile ON profile.user_account_id = account.id
+                LEFT JOIN player_deck deck ON deck.id = registration.deck_id
+                WHERE registration.event_id = ?
+                  AND registration.status = 'REGISTERED'
+                ORDER BY registration.registered_at ASC
                 """;
 
         try (Connection conn = dataSource.getConnection();
@@ -177,18 +180,21 @@ public class JdbcEventRepository implements EventRepository {
     @Override
     public Optional<EventRegistration> findRegistration(long eventId, long userAccountId) {
         String sql = """
-                SELECT er.event_id,
-                       er.user_account_id,
-                       er.status,
-                       er.registered_at,
-                       pp.display_name,
-                       ua.email
-                FROM event_registration er
-                JOIN user_account ua ON ua.id = er.user_account_id
-                JOIN player_profile pp ON pp.user_account_id = ua.id
-                WHERE er.event_id = ?
-                  AND er.user_account_id = ?
-                """;
+                SELECT registration.event_id,
+                       registration.user_account_id,
+                       registration.deck_id,
+                       registration.status,
+                       registration.registered_at,
+                       profile.display_name,
+                       account.email,
+                       deck.name AS deck_name
+                FROM event_registration registration
+                JOIN user_account account ON account.id = registration.user_account_id
+                JOIN player_profile profile ON profile.user_account_id = account.id
+                LEFT JOIN player_deck deck ON deck.id = registration.deck_id
+                WHERE registration.event_id = ?
+                  AND registration.user_account_id = ?
+            """;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -208,20 +214,22 @@ public class JdbcEventRepository implements EventRepository {
     }
 
     @Override
-    public void saveOrReactivateRegistration(long eventId, long userAccountId) {
+    public void saveOrReactivateRegistration(long eventId, long userAccountId, long deckId) {
         String sql = """
-                INSERT INTO event_registration (event_id, user_account_id, status, registered_at)
-                VALUES (?, ?, 'REGISTERED', NOW())
-                ON DUPLICATE KEY UPDATE
-                    status = 'REGISTERED',
-                    registered_at = NOW()
-                """;
+            INSERT INTO event_registration (event_id, user_account_id, deck_id, status, registered_at)
+            VALUES (?, ?, ?, 'REGISTERED', NOW())
+            ON DUPLICATE KEY UPDATE
+                deck_id = VALUES(deck_id),
+                status = 'REGISTERED',
+                registered_at = NOW()
+            """;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, eventId);
             ps.setLong(2, userAccountId);
+            ps.setLong(3, deckId);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error registering for event", e);
@@ -278,14 +286,14 @@ public class JdbcEventRepository implements EventRepository {
     @Override
     public Optional<EventResult> findResultByEventId(long eventId) {
         String sql = """
-                SELECT er.event_id,
-                       er.winner_user_account_id,
-                       er.created_at,
-                       pp.display_name AS winner_display_name
-                FROM event_result er
-                JOIN user_account ua ON ua.id = er.winner_user_account_id
-                JOIN player_profile pp ON pp.user_account_id = ua.id
-                WHERE er.event_id = ?
+               SELECT result.event_id,
+                      result.winner_user_account_id,
+                      result.created_at,
+                      profile.display_name AS winner_display_name
+               FROM event_result result
+               JOIN user_account account ON account.id = result.winner_user_account_id
+               JOIN player_profile profile ON profile.user_account_id = account.id
+               WHERE result.event_id = ?
                 """;
 
         try (Connection conn = dataSource.getConnection();
@@ -348,10 +356,17 @@ public class JdbcEventRepository implements EventRepository {
 
         registration.setEventId(rs.getLong("event_id"));
         registration.setUserAccountId(rs.getLong("user_account_id"));
+
+        long deckId = rs.getLong("deck_id");
+        if (!rs.wasNull()) {
+            registration.setDeckId(deckId);
+        }
+
         registration.setStatus(EventRegistrationStatus.valueOf(rs.getString("status")));
         registration.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
         registration.setDisplayName(rs.getString("display_name"));
         registration.setEmail(rs.getString("email"));
+        registration.setDeckName(rs.getString("deck_name"));
 
         return registration;
     }

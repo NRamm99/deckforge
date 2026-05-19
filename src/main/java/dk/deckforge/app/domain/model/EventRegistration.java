@@ -10,6 +10,8 @@ public class EventRegistration {
     private LocalDateTime registeredAt;
     private String displayName;
     private String email;
+    private Long deckId;
+    private String deckName;
 
     public EventRegistration() {
     }
@@ -60,5 +62,21 @@ public class EventRegistration {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Long getDeckId() {
+        return deckId;
+    }
+
+    public void setDeckId(Long deckId) {
+        this.deckId = deckId;
+    }
+
+    public String getDeckName() {
+        return deckName;
+    }
+
+    public void setDeckName(String deckName) {
+        this.deckName = deckName;
     }
 }

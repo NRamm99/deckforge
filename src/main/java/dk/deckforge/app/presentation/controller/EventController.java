@@ -5,12 +5,15 @@ import dk.deckforge.app.application.command.RegisterEventResultCommand;
 import dk.deckforge.app.application.dto.ProfileView;
 import dk.deckforge.app.application.service.EventService;
 import dk.deckforge.app.application.service.ProfileService;
+import dk.deckforge.app.application.service.DeckService;
 import dk.deckforge.app.domain.model.DeckFormat;
+import dk.deckforge.app.domain.model.Deck;
 import dk.deckforge.app.domain.model.Event;
 import dk.deckforge.app.domain.model.Role;
 import dk.deckforge.app.domain.model.EventStatus;
 import dk.deckforge.app.presentation.controller.form.EventResultRequest;
 import dk.deckforge.app.presentation.controller.form.EventSaveRequest;
+import dk.deckforge.app.presentation.controller.form.EvenRegistrationRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,16 +24,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class EventController {
 
     private final EventService eventService;
     private final ProfileService profileService;
+    private final DeckService deckService;
 
-    public EventController(EventService eventService, ProfileService profileService) {
+    public EventController(EventService eventService, ProfileService profileService, DeckService deckService) {
         this.eventService = eventService;
         this.profileService = profileService;
+        this.deckService = deckService;
     }
 
     @GetMapping("/events")
@@ -59,7 +66,11 @@ public class EventController {
 
         Event event = eventService.getEvent(id);
 
+        List<Deck> availableDecks = deckService.getDecksForUser(currentProfile.getUserId())
+                .stream().filter(deck -> deck.getFormat() == event.getFormat()).collect(Collectors.toList());
+
         model.addAttribute("event", event);
+        model.addAttribute("availableDecks", availableDecks);
         model.addAttribute("registrations", eventService.getRegistrations(id));
         model.addAttribute("result", eventService.getResult(id).orElse(null));
         model.addAttribute("currentUserRegistered", eventService.isUserRegistered(id, currentProfile.getUserId()));
@@ -114,12 +125,13 @@ public class EventController {
 
     @PostMapping("/events/{id}/register")
     public String registerForEvent(@PathVariable long id,
+                                   @ModelAttribute EvenRegistrationRequest request,
                                    Principal principal,
                                    RedirectAttributes redirectAttributes) {
         ProfileView currentProfile = profileService.getProfileByEmail(principal.getName());
 
         try {
-            eventService.registerForEvent(id, currentProfile.getUserId());
+            eventService.registerForEvent(id, currentProfile.getUserId(), request.deckId());
             redirectAttributes.addFlashAttribute("success", "Du er tilmeldt eventet.");
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());

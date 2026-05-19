@@ -62,30 +62,51 @@
         </section>
 
         <div class="profile-actions">
-            <form th:if="${!currentUserRegistered && event.status.name() == 'OPEN' && !event.full}"
+            <form th:if="${!currentUserRegistered && event.status.name() == 'OPEN' && !event.full && !#lists.isEmpty(availableDecks)}"
                   th:action="@{/events/{id}/register(id=${event.id})}"
-                  method="post">
+                  method="post"
+                  class="event-register-form">
+
+                <div class="event-form-row">
+                    <label for="deckId">Vælg deck</label>
+                    <select id="deckId" name="deckId" required>
+                        <option value="">Vælg deck</option>
+                        <option th:each="deck : ${availableDecks}"
+                                th:value="${deck.id}"
+                                th:text="${deck.name} + ' (' + ${deck.format} + ')'">
+                            Decknavn
+                        </option>
+                    </select>
+                </div>
+
                 <button class="btn profile-btn" type="submit">Tilmeld</button>
             </form>
-
-            <form th:if="${currentUserRegistered && event.status.name() == 'OPEN'}"
-                  th:action="@{/events/{id}/cancel-registration(id=${event.id})}"
-                  method="post">
-                <button class="btn profile-btn" type="submit">Afmeld</button>
-            </form>
+            <p class="event-message-error"
+               th:if="${!currentUserRegistered && event.status.name() == 'OPEN' && !event.full && #lists.isEmpty(availableDecks)}">
+                Du har ingen decks i dette format og kan derfor ikke tilmelde dig.
+            </p>
 
             <a class="btn profile-btn" th:href="@{/events}">Tilbage til events</a>
         </div>
 
         <section class="decks-list">
             <h2>Deltagerliste</h2>
-
             <article class="deck-list-item" th:each="registration : ${registrations}">
                 <div>
                     <h3 th:text="${registration.displayName}">Spillernavn</h3>
-                    <div class="deck-list-meta" th:if="${admin}">
-                        <span th:text="${registration.email}">email@email.dk</span>
-                        <span th:text="'Tilmeldt: ' + ${#temporals.format(registration.registeredAt, 'yyyy-MM-dd HH:mm')}">Tilmeldt</span>
+
+                    <div class="deck-list-meta">
+                        <span th:if="${registration.deckName != null}"
+                              th:text="'Deck: ' + ${registration.deckName}">
+                            Deck
+                        </span>
+
+                        <span th:if="${admin}" th:text="${registration.email}">email@email.dk</span>
+
+                        <span th:if="${admin}"
+                              th:text="'Tilmeldt: ' + ${#temporals.format(registration.registeredAt, 'yyyy-MM-dd HH:mm')}">
+                            Tilmeldt
+                        </span>
                     </div>
                 </div>
             </article>

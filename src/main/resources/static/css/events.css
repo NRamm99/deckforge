@@ -107,4 +107,19 @@
         flex-direction: column;
         align-items: stretch;
     }
+
+    .event-register-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .event-register-form .event-form-row {
+        min-width: 240px;
+    }
+
+    .event-register-form .profile-btn {
+        margin: 0;
+    }
 }

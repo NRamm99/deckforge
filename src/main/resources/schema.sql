@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS deckforge_event (
 CREATE TABLE IF NOT EXISTS event_registration (
     event_id BIGINT NOT NULL,
     user_account_id BIGINT NOT NULL,
+    deck_id BIGINT NULL,
     status VARCHAR(50) NOT NULL,
     registered_at DATETIME NOT NULL,
     PRIMARY KEY (event_id, user_account_id),
@@ -101,11 +102,15 @@ CREATE TABLE IF NOT EXISTS event_registration (
     CONSTRAINT fk_event_registration_user_account
         FOREIGN KEY (user_account_id)
         REFERENCES user_account(id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_event_registration_deck
+        FOREIGN KEY (deck_id)
+        REFERENCES player_deck(id)
+        ON DELETE SET NULL
     );
 
 CREATE TABLE IF NOT EXISTS event_result (
-event_id BIGINT PRIMARY KEY,
+    event_id BIGINT PRIMARY KEY,
     winner_user_account_id BIGINT NOT NULL,
     created_at DATETIME NOT NULL,
     CONSTRAINT fk_event_result_event

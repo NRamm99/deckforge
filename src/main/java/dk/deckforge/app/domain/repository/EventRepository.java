@@ -20,7 +20,7 @@ public interface EventRepository {
 
     Optional<EventRegistration> findRegistration(long eventId, long userAccountId);
 
-    void saveOrReactivateRegistration(long eventId, long userAccountId);
+    void saveOrReactivateRegistration(long eventId, long userAccountId, long deckId);
 
     void cancelRegistration(long eventId, long userAccountId);
 
