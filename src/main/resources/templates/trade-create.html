@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/trade/trade.css}">
     <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
     <meta charset="UTF-8">
     <title>Opret Trade - DeckForge</title>
@@ -21,8 +22,8 @@
         <p th:if="${error}" th:text="${error}"></p>
 
         <form th:action="@{/trades/new}" method="post">
-            <div id="rows" style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
-                <div class="trade-row" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+            <div id="rows" class="trade-rows">
+                <div class="trade-row">
                     <div>
                         <label>Kort</label><br>
                         <select name="cardIds" required>
@@ -37,14 +38,14 @@
 
                     <div>
                         <label>Antal</label><br>
-                        <input name="quantities" type="number" min="1" value="1" style="width:90px;">
+                        <input name="quantities" type="number" min="1" value="1" class="trade-qty-input">
                     </div>
 
                     <button class="btn deck-delete-btn remove-row" type="button">Fjern</button>
                 </div>
             </div>
 
-            <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+            <div class="trade-form-actions">
                 <button id="addRow" class="btn deck-view-btn" type="button">Tilføj række</button>
                 <button type="submit" class="btn profile-btn">Opret</button>
                 <a class="btn deck-view-btn" th:href="@{/trades}">Tilbage</a>

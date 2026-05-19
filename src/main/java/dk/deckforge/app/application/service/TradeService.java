@@ -14,6 +14,14 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import org.springframework.transaction.annotation.Transactional;
 
+// Create a trade only if the user owns the cards
+// Create an offer only if the trade is open
+// Prevent users from offering on their own trade
+// Accept an offer safely inside a transaction
+// Move card quantities between users
+// Cancel only your own open trades
+// Note fra Havre
+
 @Service
 public class TradeService {
 
@@ -29,6 +37,7 @@ public class TradeService {
         this.collectionRepository = collectionRepository;
     }
 
+    @Transactional
     public Trade createOpenTrade(long creatorUserId, List<CollectionCard> offeredCards) {
         requireNonNull(offeredCards, "offeredCards");
         if (offeredCards.isEmpty()) {
@@ -56,7 +65,8 @@ public class TradeService {
         return tradeOfferRepository.findByTradeId(tradeId);
     }
 
-    public TradeOffer createOffer(long tradeId, long offerUserId, List<CollectionCard> offeredCards) {
+    @Transactional
+    public void createOffer(long tradeId, long offerUserId, List<CollectionCard> offeredCards) {
         requireNonNull(offeredCards, "offeredCards");
         if (offeredCards.isEmpty()) {
             throw new IllegalArgumentException("Offer must include at least one card");
@@ -77,7 +87,7 @@ public class TradeService {
         offer.setOfferUserId(offerUserId);
         offer.setOfferedCards(offeredCards);
         offer.setStatus(TradeOfferStatus.PENDING);
-        return tradeOfferRepository.save(offer);
+        tradeOfferRepository.save(offer);
     }
 
     @Transactional
@@ -98,7 +108,6 @@ public class TradeService {
             throw new IllegalStateException("Offer is not pending");
         }
 
-        // Lock + validate inventory
         for (CollectionCard cc : trade.getOfferedCards()) {
             collectionRepository.requireSufficientQuantityForUpdate(actingUserId, cc.getCard().getId(), cc.getQuantity());
         }
@@ -106,7 +115,6 @@ public class TradeService {
             collectionRepository.requireSufficientQuantityForUpdate(offer.getOfferUserId(), cc.getCard().getId(), cc.getQuantity());
         }
 
-        // Exchange cards
         for (CollectionCard cc : trade.getOfferedCards()) {
             collectionRepository.decrementCardQuantity(actingUserId, cc.getCard().getId(), cc.getQuantity());
             collectionRepository.incrementCardQuantity(offer.getOfferUserId(), cc.getCard().getId(), cc.getQuantity());
@@ -121,6 +129,7 @@ public class TradeService {
         tradeOfferRepository.declineOtherPendingOffers(tradeId, offerId);
     }
 
+    @Transactional
     public void cancelTrade(long tradeId, long actingUserId) {
         Trade trade = tradeRepository.lockById(tradeId);
         if (trade.getCreatorUserId() != actingUserId) {

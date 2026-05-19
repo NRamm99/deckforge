@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/trade/trade.css}">
     <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
     <meta charset="UTF-8">
     <title th:text="'Trade #' + ${trade.id} + ' - DeckForge'">Trade - DeckForge</title>
@@ -15,7 +16,7 @@
 
 <main>
     <section class="profile-card">
-        <div style="display:flex; justify-content:space-between; gap:16px; align-items:flex-start;">
+        <div class="trade-header">
             <div>
                 <h1 th:text="'Trade #' + ${trade.id}">Trade #1</h1>
                 <p th:text="'Oprettet af user #' + ${trade.creatorUserId}">Oprettet af user #1</p>
@@ -24,7 +25,7 @@
                 <p th:if="${error}" th:text="${error}"></p>
             </div>
 
-            <div style="display:flex; gap:8px; align-items:center;">
+            <div class="trade-header-actions">
                 <form th:if="${ownTrade and openTrade}" th:action="@{/trades/{id}/cancel(id=${trade.id})}" method="post">
                     <button class="btn deck-delete-btn" type="submit">Annuller</button>
                 </form>
@@ -32,17 +33,17 @@
             </div>
         </div>
 
-        <div style="margin-top:12px;">
+        <div class="trade-items">
             <strong>Trade tilbyder:</strong>
             <span th:each="cc,iter : ${trade.offeredCards}"
                   th:text="${cc.quantity} + 'x ' + ${cc.card.name} + (${iter.last} ? '' : ', ')">1x Card</span>
         </div>
 
-        <div th:if="${!ownTrade and openTrade}" style="margin-top:18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+        <div th:if="${!ownTrade and openTrade}" class="trade-divider">
             <h2>Send bud</h2>
             <form th:action="@{/trades/{id}/offer(id=${trade.id})}" method="post">
-                <div id="offerRows" style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
-                    <div class="offer-row" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+                <div id="offerRows" class="trade-rows">
+                    <div class="offer-row trade-row">
                         <div>
                             <label>Kort</label><br>
                             <select name="cardIds" required>
@@ -57,21 +58,21 @@
 
                         <div>
                             <label>Antal</label><br>
-                            <input name="quantities" type="number" min="1" value="1" style="width:90px;">
+                            <input name="quantities" type="number" min="1" value="1" class="trade-qty-input">
                         </div>
 
                         <button class="btn deck-delete-btn remove-offer-row" type="button">Fjern</button>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+                <div class="trade-form-actions">
                     <button id="addOfferRow" class="btn deck-view-btn" type="button">Tilføj række</button>
                     <button type="submit" class="btn profile-btn">Send</button>
                 </div>
             </form>
         </div>
 
-        <div style="margin-top:18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+        <div class="trade-divider">
             <h2>Bud</h2>
 
             <div th:if="${#lists.isEmpty(offers)}">
@@ -79,15 +80,15 @@
             </div>
 
             <div th:if="${!#lists.isEmpty(offers)}">
-                <article th:each="offer : ${offers}" style="border-top: 1px solid rgba(255,255,255,0.08); padding: 12px 0;">
-                    <div style="display:flex; justify-content:space-between; gap:16px; align-items:flex-start;">
+                <article th:each="offer : ${offers}" class="trade-article">
+                    <div class="trade-article-header">
                         <div>
-                            <div style="opacity:0.9;">
+                            <div class="trade-muted">
                                 <strong th:text="'Offer #' + ${offer.id}">Offer #1</strong>
                                 <span th:text="' | Fra user #' + ${offer.offerUserId}"> | Fra user #2</span>
                                 <span th:text="' | Status: ' + ${offer.status}"> | Status: PENDING</span>
                             </div>
-                            <div style="margin-top:8px;">
+                            <div class="trade-spacer-top">
                                 <strong>Tilbyder:</strong>
                                 <span th:each="cc,iter : ${offer.offeredCards}"
                                       th:text="${cc.quantity} + 'x ' + ${cc.card.name} + (${iter.last} ? '' : ', ')">1x Card</span>

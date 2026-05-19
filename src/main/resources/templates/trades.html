@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/trade/trade.css}">
     <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
     <meta charset="UTF-8">
     <title>Byttemarked - DeckForge</title>
@@ -15,7 +16,7 @@
 
 <main>
     <section class="profile-card">
-        <div style="display:flex; justify-content:space-between; gap:16px; align-items:flex-start;">
+        <div class="trade-header">
             <div>
                 <h1>Byttemarked</h1>
                 <p>Åbne trades</p>
@@ -30,15 +31,15 @@
         </div>
 
         <div th:if="${!#lists.isEmpty(trades)}">
-            <article th:each="trade : ${trades}" style="border-top: 1px solid rgba(255,255,255,0.08); padding: 12px 0;">
-                <div style="display:flex; justify-content:space-between; gap:16px;">
+            <article th:each="trade : ${trades}" class="trade-article">
+                <div class="trade-article-header">
                     <div>
                         <h2 th:text="'Trade #' + ${trade.id}">Trade #1</h2>
-                        <div style="opacity:0.85;">
+                        <div class="trade-muted">
                             <span th:text="'Oprettet af user #' + ${trade.creatorUserId}">Oprettet af user #1</span>
                             <span th:text="' | Status: ' + ${trade.status}"> | Status: OPEN</span>
                         </div>
-                        <div style="margin-top:8px;">
+                        <div class="trade-spacer-top">
                             <strong>Tilbyder:</strong>
                             <span th:each="cc,iter : ${trade.offeredCards}"
                                   th:text="${cc.quantity} + 'x ' + ${cc.card.name} + (${iter.last} ? '' : ', ')">1x Card</span>
@@ -53,4 +54,3 @@
 
 </body>
 </html>
-
