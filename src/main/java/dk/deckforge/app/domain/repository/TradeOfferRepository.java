@@ -1,7 +1,7 @@
 package dk.deckforge.app.domain.repository;
 
 import dk.deckforge.app.domain.model.TradeOffer;
-import dk.deckforge.app.domain.model.TradeOfferStatus;
+import dk.deckforge.app.domain.enums.TradeOfferStatus;
 
 import java.util.List;
 import java.util.Optional;

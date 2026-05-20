@@ -3,7 +3,7 @@ package dk.deckforge.app.infrastructure.database;
 import dk.deckforge.app.domain.model.Card;
 import dk.deckforge.app.domain.model.CollectionCard;
 import dk.deckforge.app.domain.model.Trade;
-import dk.deckforge.app.domain.model.TradeStatus;
+import dk.deckforge.app.domain.enums.TradeStatus;
 import dk.deckforge.app.domain.repository.CardRepository;
 import dk.deckforge.app.domain.repository.TradeRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -102,6 +102,11 @@ public class JdbcTradeRepository implements TradeRepository {
         jdbcTemplate.update(sql, status.name(), tradeId);
     }
 
+    @Override
+    public void deleteById(long tradeId) {
+        jdbcTemplate.update("DELETE FROM trade WHERE id = ?", tradeId);
+    }
+
     private List<CollectionCard> findTradeCards(long tradeId) {
         String sql = """
                 SELECT card_id, quantity
@@ -128,4 +133,3 @@ public class JdbcTradeRepository implements TradeRepository {
         return trade;
     }
 }
-

@@ -1,7 +1,7 @@
 package dk.deckforge.app.application.command;
 
-import dk.deckforge.app.domain.model.DeckFormat;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.DeckFormat;
+import dk.deckforge.app.domain.enums.Visibility;
 
 import java.util.Map;
 

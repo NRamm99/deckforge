@@ -1,9 +1,9 @@
 package dk.deckforge.app.infrastructure.database;
 
 import dk.deckforge.app.domain.model.Card;
-import dk.deckforge.app.domain.model.CardColor;
-import dk.deckforge.app.domain.model.CardRarity;
-import dk.deckforge.app.domain.model.CardType;
+import dk.deckforge.app.domain.enums.CardColor;
+import dk.deckforge.app.domain.enums.CardRarity;
+import dk.deckforge.app.domain.enums.CardType;
 import dk.deckforge.app.domain.repository.CardRepository;
 import org.springframework.stereotype.Repository;
 

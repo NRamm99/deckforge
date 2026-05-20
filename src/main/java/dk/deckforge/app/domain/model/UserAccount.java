@@ -1,5 +1,7 @@
 package dk.deckforge.app.domain.model;
 
+import dk.deckforge.app.domain.enums.Role;
+
 public class UserAccount {
     long id;
     String email;

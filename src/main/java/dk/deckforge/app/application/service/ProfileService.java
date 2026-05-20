@@ -4,7 +4,7 @@ import dk.deckforge.app.application.command.UpdateDebugProfileCommand;
 import dk.deckforge.app.application.dto.ProfileView;
 import dk.deckforge.app.application.port.PasswordHasher;
 import dk.deckforge.app.domain.model.PlayerProfile;
-import dk.deckforge.app.domain.model.Role;
+import dk.deckforge.app.domain.enums.Role;
 import dk.deckforge.app.domain.model.UserAccount;
 import dk.deckforge.app.domain.repository.PlayerProfileRepository;
 import dk.deckforge.app.domain.repository.UserAccountRepository;

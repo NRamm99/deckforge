@@ -1,7 +1,7 @@
 package dk.deckforge.app.presentation.controller.form;
 
-import dk.deckforge.app.domain.model.DeckFormat;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.DeckFormat;
+import dk.deckforge.app.domain.enums.Visibility;
 
 public record DeckSaveRequest(String deckName, DeckFormat format, Visibility visibility, Boolean conceptDeck) {
 

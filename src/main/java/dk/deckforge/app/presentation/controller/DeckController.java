@@ -4,7 +4,7 @@ import dk.deckforge.app.application.dto.ProfileView;
 import dk.deckforge.app.application.service.DeckService;
 import dk.deckforge.app.application.service.ProfileService;
 import dk.deckforge.app.domain.model.Deck;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.Visibility;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

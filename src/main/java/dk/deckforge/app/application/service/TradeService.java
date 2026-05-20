@@ -3,8 +3,9 @@ package dk.deckforge.app.application.service;
 import dk.deckforge.app.domain.model.CollectionCard;
 import dk.deckforge.app.domain.model.Trade;
 import dk.deckforge.app.domain.model.TradeOffer;
-import dk.deckforge.app.domain.model.TradeOfferStatus;
-import dk.deckforge.app.domain.model.TradeStatus;
+import dk.deckforge.app.domain.enums.TradeOfferStatus;
+import dk.deckforge.app.domain.enums.TradeStatus;
+import dk.deckforge.app.domain.repository.CardReservationRepository;
 import dk.deckforge.app.domain.repository.CollectionRepository;
 import dk.deckforge.app.domain.repository.TradeOfferRepository;
 import dk.deckforge.app.domain.repository.TradeRepository;
@@ -28,13 +29,16 @@ public class TradeService {
     private final TradeRepository tradeRepository;
     private final TradeOfferRepository tradeOfferRepository;
     private final CollectionRepository collectionRepository;
+    private final CardReservationRepository cardReservationRepository;
 
     public TradeService(TradeRepository tradeRepository,
                         TradeOfferRepository tradeOfferRepository,
-                        CollectionRepository collectionRepository) {
+                        CollectionRepository collectionRepository,
+                        CardReservationRepository cardReservationRepository) {
         this.tradeRepository = tradeRepository;
         this.tradeOfferRepository = tradeOfferRepository;
         this.collectionRepository = collectionRepository;
+        this.cardReservationRepository = cardReservationRepository;
     }
 
     @Transactional
@@ -49,7 +53,9 @@ public class TradeService {
         trade.setCreatorUserId(creatorUserId);
         trade.setOfferedCards(offeredCards);
         trade.setStatus(TradeStatus.OPEN);
-        return tradeRepository.save(trade);
+        Trade created = tradeRepository.save(trade);
+        cardReservationRepository.reserve("TRADE", created.getId(), creatorUserId, offeredCards);
+        return created;
     }
 
     public List<Trade> listOpenTrades() {
@@ -88,6 +94,7 @@ public class TradeService {
         offer.setOfferedCards(offeredCards);
         offer.setStatus(TradeOfferStatus.PENDING);
         tradeOfferRepository.save(offer);
+        cardReservationRepository.reserve("OFFER", offer.getId(), offerUserId, offeredCards);
     }
 
     @Transactional
@@ -108,11 +115,16 @@ public class TradeService {
             throw new IllegalStateException("Offer is not pending");
         }
 
+        // Release the reservations for the accepted trade+offer before moving quantities.
+        // This makes the standard "available" checks and decrements work.
+        cardReservationRepository.release("TRADE", tradeId);
+        cardReservationRepository.release("OFFER", offerId);
+
         for (CollectionCard cc : trade.getOfferedCards()) {
-            collectionRepository.requireSufficientQuantityForUpdate(actingUserId, cc.getCard().getId(), cc.getQuantity());
+            collectionRepository.requireSufficientTotalQuantityForUpdate(actingUserId, cc.getCard().getId(), cc.getQuantity());
         }
         for (CollectionCard cc : offer.getOfferedCards()) {
-            collectionRepository.requireSufficientQuantityForUpdate(offer.getOfferUserId(), cc.getCard().getId(), cc.getQuantity());
+            collectionRepository.requireSufficientTotalQuantityForUpdate(offer.getOfferUserId(), cc.getCard().getId(), cc.getQuantity());
         }
 
         for (CollectionCard cc : trade.getOfferedCards()) {
@@ -127,18 +139,46 @@ public class TradeService {
         tradeRepository.updateStatus(tradeId, TradeStatus.COMPLETED);
         tradeOfferRepository.updateStatus(offerId, TradeOfferStatus.ACCEPTED);
         tradeOfferRepository.declineOtherPendingOffers(tradeId, offerId);
+
+        // Release any remaining reservations tied to this trade (e.g. other pending offers).
+        cardReservationRepository.releaseByTradeId(tradeId);
     }
 
     @Transactional
-    public void cancelTrade(long tradeId, long actingUserId) {
+    public void declineOffer(long tradeId, long offerId, long actingUserId) {
+        Trade trade = tradeRepository.lockById(tradeId);
+        if (trade.getStatus() != TradeStatus.OPEN) {
+            throw new IllegalStateException("Trade is not open");
+        }
+        if (trade.getCreatorUserId() != actingUserId) {
+            throw new IllegalStateException("Only the trade creator can decline offers");
+        }
+
+        TradeOffer offer = tradeOfferRepository.lockById(offerId);
+        if (offer.getTradeId() != tradeId) {
+            throw new IllegalArgumentException("Offer not found for trade");
+        }
+        if (offer.getStatus() != TradeOfferStatus.PENDING) {
+            throw new IllegalStateException("Offer is not pending");
+        }
+
+        tradeOfferRepository.updateStatus(offerId, TradeOfferStatus.DECLINED);
+        cardReservationRepository.release("OFFER", offerId);
+    }
+
+    @Transactional
+    public void deleteTrade(long tradeId, long actingUserId) {
         Trade trade = tradeRepository.lockById(tradeId);
         if (trade.getCreatorUserId() != actingUserId) {
             throw new IllegalStateException("Trade not owned by user");
         }
-        if (trade.getStatus() != TradeStatus.OPEN) {
-            throw new IllegalStateException("Trade is not open");
+        if (trade.getStatus() == TradeStatus.COMPLETED) {
+            throw new IllegalStateException("Completed trades cannot be deleted");
         }
-        tradeRepository.updateStatus(tradeId, TradeStatus.CANCELLED);
+
+        // "Return" cards by releasing any reservations; ownership was never decremented.
+        cardReservationRepository.releaseByTradeId(tradeId);
+        tradeRepository.deleteById(tradeId);
     }
 
     private void ensureUserHasCards(long userAccountId, List<CollectionCard> cards) {

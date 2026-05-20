@@ -1,4 +1,4 @@
-package dk.deckforge.app.domain.model;
+package dk.deckforge.app.domain.enums;
 
 public enum TradeOfferStatus {
     PENDING,
@@ -6,3 +6,4 @@ public enum TradeOfferStatus {
     DECLINED,
     CANCELLED
 }
+

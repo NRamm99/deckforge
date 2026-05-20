@@ -1,6 +1,6 @@
 package dk.deckforge.app.infrastructure.database;
 
-import dk.deckforge.app.domain.model.Role;
+import dk.deckforge.app.domain.enums.Role;
 import dk.deckforge.app.domain.model.UserAccount;
 import dk.deckforge.app.domain.repository.UserAccountRepository;
 import org.springframework.stereotype.Repository;

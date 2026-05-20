@@ -9,7 +9,7 @@ import dk.deckforge.app.application.service.TradeService;
 import dk.deckforge.app.domain.model.CollectionCard;
 import dk.deckforge.app.domain.model.Trade;
 import dk.deckforge.app.domain.model.TradeOffer;
-import dk.deckforge.app.domain.model.TradeStatus;
+import dk.deckforge.app.domain.enums.TradeStatus;
 import dk.deckforge.app.presentation.web.SafeRedirect;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class TradeController {
@@ -44,9 +46,16 @@ public class TradeController {
     @GetMapping("/trades")
     public String trades(Model model, Principal principal) {
         ProfileView currentProfile = profileService.getProfileByEmail(principal.getName());
+        List<Trade> trades = tradeService.listOpenTrades();
+
+        Map<Long, List<TradeOffer>> offersByTrade = new HashMap<>();
+        for (Trade trade : trades) {
+            offersByTrade.put(trade.getId(), tradeService.listOffersForTrade(trade.getId()));
+        }
         model.addAttribute("currentProfile", currentProfile);
-        model.addAttribute("trades", tradeService.listOpenTrades());
-        return "trades";
+        model.addAttribute("trades", trades);
+        model.addAttribute("offersByTrade", offersByTrade);
+        return "trade-db";
     }
 
     @GetMapping("/trades/new")
@@ -56,7 +65,7 @@ public class TradeController {
 
         model.addAttribute("currentProfile", currentProfile);
         model.addAttribute("collectionCards", collectionCards);
-        return "trade-create";
+        return "create-trade";
     }
 
     @PostMapping("/trades/new")
@@ -132,20 +141,37 @@ public class TradeController {
         return "redirect:/trades/" + tradeId;
     }
 
-    @PostMapping("/trades/{tradeId}/cancel")
-    public String cancelTrade(@PathVariable long tradeId,
+    @PostMapping("/trades/{tradeId}/offers/{offerId}/decline")
+    public String declineOffer(@PathVariable long tradeId,
+                               @PathVariable long offerId,
+                               Principal principal,
+                               RedirectAttributes redirectAttributes) {
+        ProfileView currentProfile = profileService.getProfileByEmail(principal.getName());
+
+        try {
+            tradeService.declineOffer(tradeId, offerId, currentProfile.getUserId());
+            redirectAttributes.addFlashAttribute("success", "Bud afvist.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+
+        return "redirect:/trades/" + tradeId;
+    }
+
+    @PostMapping("/trades/{tradeId}/delete")
+    public String deleteTrade(@PathVariable long tradeId,
                               Principal principal,
                               RedirectAttributes redirectAttributes,
                               @RequestHeader(value = "Referer", required = false) String referer) {
         ProfileView currentProfile = profileService.getProfileByEmail(principal.getName());
 
         try {
-            tradeService.cancelTrade(tradeId, currentProfile.getUserId());
-            redirectAttributes.addFlashAttribute("success", "Trade annulleret.");
+            tradeService.deleteTrade(tradeId, currentProfile.getUserId());
+            redirectAttributes.addFlashAttribute("success", "Trade slettet.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
 
-        return "redirect:" + SafeRedirect.byPathPrefix(referer, "/trades/", "/trades/" + tradeId);
+        return "redirect:" + SafeRedirect.byPathPrefix(referer, "/trades", "/trades");
     }
 }

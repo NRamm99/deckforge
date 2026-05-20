@@ -1,5 +1,7 @@
 package dk.deckforge.app.domain.model;
 
+import dk.deckforge.app.domain.enums.TradeOfferStatus;
+
 import java.util.List;
 
 public class TradeOffer {

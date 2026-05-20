@@ -3,7 +3,7 @@ package dk.deckforge.app.infrastructure.database;
 import dk.deckforge.app.domain.model.Card;
 import dk.deckforge.app.domain.model.CollectionCard;
 import dk.deckforge.app.domain.model.TradeOffer;
-import dk.deckforge.app.domain.model.TradeOfferStatus;
+import dk.deckforge.app.domain.enums.TradeOfferStatus;
 import dk.deckforge.app.domain.repository.CardRepository;
 import dk.deckforge.app.domain.repository.TradeOfferRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -139,4 +139,3 @@ public class JdbcTradeOfferRepository implements TradeOfferRepository {
         return offer;
     }
 }
-

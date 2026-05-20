@@ -1,10 +1,10 @@
 package dk.deckforge.app.infrastructure.database;
 
 import dk.deckforge.app.domain.model.Card;
-import dk.deckforge.app.domain.model.CardColor;
+import dk.deckforge.app.domain.enums.CardColor;
 import dk.deckforge.app.domain.model.CollectionCard;
-import dk.deckforge.app.domain.model.CardRarity;
-import dk.deckforge.app.domain.model.CardType;
+import dk.deckforge.app.domain.enums.CardRarity;
+import dk.deckforge.app.domain.enums.CardType;
 import dk.deckforge.app.domain.repository.CollectionRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,6 +77,9 @@ public class JdbcCollectionRepository implements CollectionRepository {
 
     @Override
     public void removeCardFromUserCollection(long userAccountId, long cardId) {
+        // Ensure we don't remove a reserved card (availability check includes reservations).
+        requireSufficientQuantityForUpdate(userAccountId, cardId, 1);
+
         String decrementSql = """
                 UPDATE player_collection_card
                 SET quantity = quantity - 1
@@ -111,6 +114,36 @@ public class JdbcCollectionRepository implements CollectionRepository {
             throw new IllegalArgumentException("requiredQuantity must be positive");
         }
 
+        // Check "available" quantity (owned - reserved).
+        String ownedSql = "SELECT quantity FROM player_collection_card WHERE user_account_id = ? AND card_id = ? FOR UPDATE";
+        Integer have = jdbcTemplate.query(ownedSql, rs -> rs.next() ? rs.getInt("quantity") : 0, userAccountId, cardId);
+        if (have == null) {
+            have = 0;
+        }
+
+        String reservedSql = """
+                SELECT COALESCE(SUM(quantity), 0) AS reserved_qty
+                FROM card_reservation
+                WHERE user_account_id = ? AND card_id = ?
+                FOR UPDATE
+                """;
+        Integer reserved = jdbcTemplate.query(reservedSql, rs -> rs.next() ? rs.getInt("reserved_qty") : 0, userAccountId, cardId);
+        if (reserved == null) {
+            reserved = 0;
+        }
+
+        int available = have - reserved;
+        if (available < requiredQuantity) {
+            throw new IllegalStateException("User " + userAccountId + " does not have enough available of card " + cardId);
+        }
+    }
+
+    @Override
+    public void requireSufficientTotalQuantityForUpdate(long userAccountId, long cardId, int requiredQuantity) {
+        if (requiredQuantity <= 0) {
+            throw new IllegalArgumentException("requiredQuantity must be positive");
+        }
+
         String sql = "SELECT quantity FROM player_collection_card WHERE user_account_id = ? AND card_id = ? FOR UPDATE";
         Integer have = jdbcTemplate.query(sql, rs -> rs.next() ? rs.getInt("quantity") : 0, userAccountId, cardId);
         if (have == null) {
@@ -140,6 +173,9 @@ public class JdbcCollectionRepository implements CollectionRepository {
         if (quantity <= 0) {
             throw new IllegalArgumentException("quantity must be positive");
         }
+
+        // Don't allow decrementing below reserved quantity.
+        requireSufficientQuantityForUpdate(userAccountId, cardId, quantity);
 
         String updateSql = """
                 UPDATE player_collection_card

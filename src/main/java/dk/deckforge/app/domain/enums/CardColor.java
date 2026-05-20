@@ -1,4 +1,4 @@
-package dk.deckforge.app.domain.model;
+package dk.deckforge.app.domain.enums;
 
 public enum CardColor {
     WHITE,
@@ -7,3 +7,4 @@ public enum CardColor {
     GREEN,
     RED
 }
+

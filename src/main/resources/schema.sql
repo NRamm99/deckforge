@@ -123,3 +123,23 @@ CREATE TABLE IF NOT EXISTS trade_offer_card (
         REFERENCES card(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS card_reservation (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_account_id BIGINT NOT NULL,
+    card_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    reservation_type VARCHAR(20) NOT NULL,
+    reservation_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_card_reservation_user_card (user_account_id, card_id),
+    INDEX idx_card_reservation_type_id (reservation_type, reservation_id),
+    CONSTRAINT fk_card_reservation_user_account
+        FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_card_reservation_card
+        FOREIGN KEY (card_id)
+        REFERENCES card(id)
+        ON DELETE CASCADE
+);

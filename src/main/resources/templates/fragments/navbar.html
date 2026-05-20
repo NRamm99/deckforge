@@ -6,7 +6,9 @@
     <div class="nav-links">
         <a th:href="@{/profile}" th:classappend="${#strings.startsWith(currentPath, '/profile') || #strings.startsWith(currentPath, '/collection')} ? 'active'">Profil</a>
         <a th:href="@{/events}" th:classappend="${#strings.startsWith(currentPath, '/events')} ? 'active'">Events</a>
-        <a th:href="@{/trades}" th:classappend="${#strings.startsWith(currentPath, '/trades')} ? 'active'">Byttemarked</a>
+        <a th:href="@{/trades}"
+           th:classappend="${#strings.equals(currentPath, '/trades') || (#strings.startsWith(currentPath, '/trades/') && !#strings.startsWith(currentPath, '/trades/new'))} ? 'active'">Byttemarked</a>
+        <a th:href="@{/trades/new}" th:classappend="${#strings.startsWith(currentPath, '/trades/new')} ? 'active'">Opret trade</a>
         <a th:href="@{/card-db}" th:classappend="${#strings.startsWith(currentPath, '/card-db')} ? 'active'">Kortdatabase</a>
         <a th:href="@{/deck-builder}" th:classappend="${#strings.startsWith(currentPath, '/deck-builder')} ? 'active'">Deck-builder</a>
         <a th:href="@{/create-card}" th:classappend="${#strings.startsWith(currentPath, '/create-card')} ? 'active'">Opret kort</a>
