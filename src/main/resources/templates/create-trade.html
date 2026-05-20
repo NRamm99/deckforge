@@ -18,7 +18,7 @@
         <div class="trade-card-font">
             <div>
                 <h1>Opret trade</h1>
-                <p class="trade-muted">Vaelg kort fra din samling at tilbyde.</p>
+                <p class="trade-muted">Vælg kort fra din samling at tilbyde.</p>
                 <p th:if="${error}" th:text="${error}"></p>
             </div>
         </div>
@@ -36,8 +36,8 @@
                     <button class="trade-add-button"
                             type="button"
                             th:attr="data-card-id=${cc.card.id},data-card-name=${cc.card.name},data-card-image=${cc.card.imageUrl},data-owned=${cc.quantity}"
-                            aria-label="Tilfoej kort"
-                            title="Tilfoej kort">+</button>
+                            aria-label="Tilføj kort"
+                            title="Tilføj kort">+</button>
                 </div>
             </div>
 

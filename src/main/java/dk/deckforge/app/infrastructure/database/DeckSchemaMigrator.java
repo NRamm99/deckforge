@@ -27,7 +27,6 @@ public class DeckSchemaMigrator implements ApplicationRunner {
     public void addDeckVisibilityColumnIfMissing() {
         try (Connection conn = dataSource.getConnection()) {
             if (!hasTable(conn, "player_deck")) {
-                // Schema init (schema.sql) may not have run yet or DB is empty; avoid failing app startup.
                 return;
             }
             if (hasColumn(conn, "player_deck", "visibility")) {

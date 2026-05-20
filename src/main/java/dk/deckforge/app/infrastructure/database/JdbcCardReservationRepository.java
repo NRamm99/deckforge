@@ -48,8 +48,6 @@ public class JdbcCardReservationRepository implements CardReservationRepository 
 
     @Override
     public void releaseByTradeId(long tradeId) {
-        // Release the trade creator's reservation, plus all offer reservations for that trade.
-        // This relies on the offer reservation_id being the trade_offer.id.
         jdbcTemplate.update("DELETE FROM card_reservation WHERE reservation_type = 'TRADE' AND reservation_id = ?", tradeId);
         jdbcTemplate.update("""
                 DELETE FROM card_reservation

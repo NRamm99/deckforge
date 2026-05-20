@@ -77,7 +77,6 @@ public class JdbcCollectionRepository implements CollectionRepository {
 
     @Override
     public void removeCardFromUserCollection(long userAccountId, long cardId) {
-        // Ensure we don't remove a reserved card (availability check includes reservations).
         requireSufficientQuantityForUpdate(userAccountId, cardId, 1);
 
         String decrementSql = """
@@ -174,7 +173,6 @@ public class JdbcCollectionRepository implements CollectionRepository {
             throw new IllegalArgumentException("quantity must be positive");
         }
 
-        // Don't allow decrementing below reserved quantity.
         requireSufficientQuantityForUpdate(userAccountId, cardId, quantity);
 
         String updateSql = """

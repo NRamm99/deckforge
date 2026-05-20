@@ -15,14 +15,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import org.springframework.transaction.annotation.Transactional;
 
-// Create a trade only if the user owns the cards
-// Create an offer only if the trade is open
-// Prevent users from offering on their own trade
-// Accept an offer safely inside a transaction
-// Move card quantities between users
-// Cancel only your own open trades
-// Note fra Havre
-
 @Service
 public class TradeService {
 
