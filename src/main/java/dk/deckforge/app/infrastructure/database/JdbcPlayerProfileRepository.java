@@ -91,12 +91,33 @@ public class JdbcPlayerProfileRepository implements PlayerProfileRepository {
         }
     }
 
+    @Override
+    public void updateAvatarUrl(long userAccountId, String avatarUrl) {
+        String sql = """
+            UPDATE player_profile
+            SET avatar_url = ?
+            WHERE user_account_id = ?
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, avatarUrl);
+            ps.setLong(2, userAccountId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating avatar url", e);
+        }
+    }
+
     private PlayerProfile mapRow(ResultSet rs) throws SQLException {
         PlayerProfile profile = new PlayerProfile();
         profile.setId(rs.getLong("id"));
         profile.setUserAccountId(rs.getLong("user_account_id"));
         profile.setDisplayName(rs.getString("display_name"));
         profile.setCollectionVisibility(Visibility.valueOf(rs.getString("collection_visibility")));
+        profile.setAvatarUrl(rs.getString("avatar_url"));
         return profile;
     }
 }
