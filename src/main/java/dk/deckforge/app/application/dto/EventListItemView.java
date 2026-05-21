@@ -1,6 +1,6 @@
 package dk.deckforge.app.application.dto;
 
-import dk.deckforge.app.domain.model.DeckFormat;
+import dk.deckforge.app.domain.enums.DeckFormat;
 import dk.deckforge.app.domain.model.EventStatus;
 
 import java.time.LocalDateTime;

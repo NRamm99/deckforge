@@ -1,6 +1,6 @@
 package dk.deckforge.app.presentation.controller.form;
 
-import dk.deckforge.app.domain.model.DeckFormat;
+import dk.deckforge.app.domain.enums.DeckFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;

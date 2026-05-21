@@ -1,6 +1,6 @@
 package dk.deckforge.app.infrastructure.database;
 
-import dk.deckforge.app.domain.model.DeckFormat;
+import dk.deckforge.app.domain.enums.DeckFormat;
 import dk.deckforge.app.domain.model.Event;
 import dk.deckforge.app.domain.model.EventRegistration;
 import dk.deckforge.app.domain.model.EventRegistrationStatus;

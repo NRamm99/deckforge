@@ -45,7 +45,7 @@
                     <select id="role" name="role">
                         <option th:each="role : ${roles}"
                                 th:value="${role}"
-                                th:text="${role == T(dk.deckforge.app.domain.model.Role).ADMIN ? 'Administrator' : 'Bruger'}"
+                                th:text="${role == T(dk.deckforge.app.domain.enums.Role).ADMIN ? 'Administrator' : 'Bruger'}"
                                 th:selected="${role == profile.role}"></option>
                     </select>
                 </div>

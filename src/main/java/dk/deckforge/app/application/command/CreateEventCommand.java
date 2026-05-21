@@ -1,6 +1,6 @@
 package dk.deckforge.app.application.command;
 
-import dk.deckforge.app.domain.model.DeckFormat;
+import dk.deckforge.app.domain.enums.DeckFormat;
 
 import java.time.LocalDateTime;
 

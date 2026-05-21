@@ -1,5 +1,7 @@
 package dk.deckforge.app.domain.model;
 
+import dk.deckforge.app.domain.enums.DeckFormat;
+
 import java.time.LocalDateTime;
 
 public class Event {
