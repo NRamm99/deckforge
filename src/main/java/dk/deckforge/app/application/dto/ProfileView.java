@@ -10,13 +10,16 @@ public class ProfileView {
     private String displayName;
     private Visibility collectionVisibility;
     private Role role;
+    private String avatarUrl;
 
-    public ProfileView(long userId, String email, String displayName, Visibility collectionVisibility, Role role) {
+    public ProfileView(long userId, String email, String displayName, Visibility collectionVisibility, Role role, String avatarUrl) {
         this.userId = userId;
         this.email = email;
         this.displayName = displayName;
         this.collectionVisibility = collectionVisibility;
         this.role = role;
+        this.avatarUrl = avatarUrl;
+
     }
 
     public long getUserId() {
@@ -44,5 +47,9 @@ public class ProfileView {
             return "Administrator";
         }
         return "Bruger";
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 }

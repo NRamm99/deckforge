@@ -18,14 +18,29 @@
 <div class="profile-card">
 
     <section class="profile-header" aria-label="Profiloplysninger">
-        <div class="profile-avatar" aria-hidden="true">
-            <span>DF</span>
+
+        <div class="profile-avatar-wrapper">
+            <div class="profile-avatar">
+                <img th:if="${profile.avatarUrl != null}"
+                     th:src="@{${profile.avatarUrl}}"
+                     alt="Profilbillede"
+                     class="profile-avatar-img">
+
+                <span th:if="${profile.avatarUrl == null}">DF</span>
+            </div>
+
+            <button class="profile-avatar-change-button"
+                    type="button"
+                    data-dialog-id="avatar-picker-dialog">
+                Skift profilbillede
+            </button>
         </div>
 
         <div class="profile-identity">
             <h1 th:text="${profile.displayName}">Brugernavn</h1>
             <p class="profile-email" th:text="${profile.email}">email@email.dk</p>
         </div>
+
     </section>
 
     <section class="profile-details" aria-label="Kontodetaljer">
@@ -51,7 +66,45 @@
     </div>
 
 </div>
+
+    <dialog class="avatar-picker-dialog" id="avatar-picker-dialog">
+        <button class="avatar-picker-close" type="button" aria-label="Luk">×</button>
+
+        <div class="avatar-picker-content">
+            <h2>Vælg profilbillede</h2>
+
+            <form th:action="@{/profile/avatar}" method="post" class="avatar-picker-grid">
+                <button th:each="avatar : ${avatarOptions}"
+                        type="submit"
+                        name="avatarUrl"
+                        th:value="${avatar}"
+                        class="avatar-picker-option"
+                        th:classappend="${profile.avatarUrl == avatar} ? ' selected'">
+                    <img th:src="@{${avatar}}" alt="Avatar valg">
+                </button>
+            </form>
+        </div>
+    </dialog>
+
 </main>
+
+<script>
+    document.querySelectorAll(".profile-avatar-change-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            document.getElementById(button.dataset.dialogId)?.showModal();
+        });
+    });
+
+    document.querySelectorAll(".avatar-picker-dialog").forEach((dialog) => {
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) {
+                dialog.close();
+            }
+        });
+
+        dialog.querySelector(".avatar-picker-close")?.addEventListener("click", () => dialog.close());
+    });
+</script>
 
 </body>
 </html>

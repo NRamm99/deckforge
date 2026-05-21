@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class ProfileController {
@@ -36,7 +37,15 @@ public class ProfileController {
     public String ownProfile(Principal principal, Model model) {
         ProfileView profile = profileService.getProfileByEmail(principal.getName());
         model.addAttribute("profile", profile);
+        model.addAttribute("avatarOptions", avatarOptions());
         return "profile";
+    }
+
+    @PostMapping("/profile/avatar")
+    public String updateAvatar(String avatarUrl, Principal principal, RedirectAttributes redirectAttributes) {
+        profileService.updateAvatarUrl(principal.getName(), avatarUrl);
+        redirectAttributes.addFlashAttribute("success", "Profilbillede er opdateret.");
+        return "redirect:/profile";
     }
 
     @GetMapping("/profile/debug")
@@ -89,5 +98,20 @@ public class ProfileController {
                 userDetails.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private List<String> avatarOptions() {
+        return List.of(
+                "/images/avatars/Jace.jpg",
+                "/images/avatars/Liliana.jpg",
+                "/images/avatars/Chandra.jpg",
+                "/images/avatars/Nissa.jpg",
+                "/images/avatars/Teferi.jpg",
+                "/images/avatars/Garruk.jpg",
+                "/images/avatars/Ajani.jpg",
+                "/images/avatars/Nicol.jpg",
+                "/images/avatars/Karn.jpg",
+                "/images/avatars/Sorin.jpg"
+        );
     }
 }

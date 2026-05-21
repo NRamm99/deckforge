@@ -42,14 +42,12 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: whitesmoke;
-    /* font-size: 16px; */
 
     width: 100px;
     height: 50px;
     background-color: #276c4d;
     border-radius: 15px;
 
-    /* border fix for button */
     border: none;
     font: inherit;
     appearance: none;
@@ -115,7 +113,7 @@ p {
     font-weight: bold;
 }
 
-.index-buttons{
+.index-buttons {
     margin: 28px auto 0;
     width: min(250px, calc(100% - 32px));
     display: flex;
@@ -123,7 +121,6 @@ p {
     align-items: center;
     justify-content: center;
     text-align: center;
-
 }
 
 .auth-card {
@@ -227,6 +224,13 @@ p {
     gap: 28px;
 }
 
+.profile-avatar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
 .profile-avatar {
     width: 140px;
     height: 140px;
@@ -240,12 +244,51 @@ p {
     border: 4px solid #27ae60;
     border-radius: 50%;
     box-shadow: inset 0 0 0 6px rgba(255,255,255,0.05);
+
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .profile-avatar span {
     color: #e2e8f0;
     font-size: 34px;
     font-weight: bold;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-avatar-change-button {
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    background: transparent;
+    color: #dbe4ef;
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: underline;
+
+    cursor: pointer;
+}
+
+.profile-avatar-change-button:hover,
+.profile-avatar-change-button:focus {
+    width: auto;
+    height: auto;
+    font-size: 14px;
+
+    background: transparent;
+    color: #27ae60;
+    outline: none;
 }
 
 .profile-identity {
@@ -611,6 +654,137 @@ p {
     overflow-wrap: anywhere;
 }
 
+/* Avatar popup */
+.avatar-picker-dialog {
+    width: min(620px, calc(100vw - 48px));
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+    background-color: #0f172a;
+    color: whitesmoke;
+    overflow: visible;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+}
+
+.avatar-picker-dialog::backdrop {
+    background: rgba(2, 6, 23, 0.82);
+    backdrop-filter: blur(3px);
+}
+
+.avatar-picker-content {
+    padding: 26px;
+    background-color: #0f172a;
+    border-radius: 16px;
+    color: whitesmoke;
+}
+
+.avatar-picker-content h2 {
+    width: auto;
+    margin: 0 0 24px;
+    padding-bottom: 16px;
+
+    display: block;
+    text-align: left;
+
+    color: whitesmoke;
+    font-size: 26px;
+    font-weight: bold;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.avatar-picker-close {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #94a3b8;
+
+    cursor: pointer;
+    font-size: 26px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.avatar-picker-close:hover,
+.avatar-picker-close:focus {
+    width: 36px;
+    height: 36px;
+    font-size: 26px;
+
+    background: rgba(255, 255, 255, 0.08);
+    color: whitesmoke;
+    outline: none;
+}
+
+.avatar-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 82px);
+    gap: 20px;
+    justify-content: center;
+}
+
+.avatar-picker-option {
+    width: 82px;
+    height: 82px;
+    min-width: 82px;
+    max-width: 82px;
+    min-height: 82px;
+    max-height: 82px;
+
+    margin: 0;
+    padding: 0;
+
+    border: 3px solid transparent;
+    border-radius: 50%;
+    overflow: hidden;
+
+    background: #1e293b;
+    cursor: pointer;
+    box-sizing: border-box;
+    appearance: none;
+
+    transition: 0.18s;
+}
+
+.avatar-picker-option:hover,
+.avatar-picker-option:focus {
+    width: 82px;
+    height: 82px;
+    font-size: inherit;
+
+    transform: translateY(-2px);
+    border-color: #27ae60;
+    background: #1e293b;
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.18);
+    outline: none;
+}
+
+.avatar-picker-option.selected {
+    border-color: #f97316;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.22);
+}
+
+.avatar-picker-option img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Mobile */
 @media (max-width: 640px) {
     .profile-card {
         padding: 28px;
@@ -643,5 +817,25 @@ p {
 
     .profile-actions {
         justify-content: center;
+    }
+
+    .avatar-picker-dialog {
+        width: calc(100vw - 24px);
+    }
+
+    .avatar-picker-grid {
+        grid-template-columns: repeat(3, 76px);
+        gap: 16px;
+    }
+
+    .avatar-picker-option,
+    .avatar-picker-option:hover,
+    .avatar-picker-option:focus {
+        width: 76px;
+        height: 76px;
+        min-width: 76px;
+        max-width: 76px;
+        min-height: 76px;
+        max-height: 76px;
     }
 }

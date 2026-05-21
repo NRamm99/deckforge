@@ -1,0 +1,125 @@
+.event-form {
+    display: grid;
+    gap: 18px;
+}
+
+.event-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.event-form-row label {
+    color: whitesmoke;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.event-form-row input,
+.event-form-row select {
+    height: 44px;
+    padding: 0 14px;
+
+    border: none;
+    border-radius: 10px;
+    outline: none;
+
+    background-color: #0f172a;
+    color: whitesmoke;
+    font-size: 16px;
+}
+
+.event-form-row input:focus,
+.event-form-row select:focus {
+    box-shadow: 0 0 0 2px #27ae60;
+}
+
+.event-message-error {
+    width: auto;
+    margin: 0;
+    padding: 10px 12px;
+    display: block;
+
+    color: whitesmoke;
+    background: rgba(239, 68, 68, 0.16);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 8px;
+    text-align: left;
+}
+
+.event-message-success {
+    width: auto;
+    margin: 0;
+    padding: 10px 12px;
+    display: block;
+
+    color: whitesmoke;
+    background: rgba(39, 174, 96, 0.18);
+    border: 1px solid rgba(39, 174, 96, 0.35);
+    border-radius: 8px;
+    text-align: left;
+}
+
+.event-section-title {
+    margin: 24px 0 12px;
+    color: whitesmoke;
+    font-size: 24px;
+}
+
+.event-result-box {
+    margin-top: 10px;
+}
+
+.event-full-label {
+    color: #f97316;
+    font-weight: bold;
+}
+
+.event-open-label {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.event-admin-action {
+    margin: 0;
+    width: 160px;
+    height: 48px;
+    border-radius: 10px;
+}
+
+.event-admin-action:hover {
+    width: 160px;
+    height: 48px;
+    font-size: 16px;
+}
+
+@media (max-width: 640px) {
+    .deck-list-item {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .deck-list-item dl {
+        flex-wrap: wrap;
+    }
+
+    .decks-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .event-register-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .event-register-form .event-form-row {
+        min-width: 240px;
+    }
+
+    .event-register-form .profile-btn {
+        margin: 0;
+    }
+}
