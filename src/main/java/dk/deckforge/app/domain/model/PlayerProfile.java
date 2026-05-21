@@ -6,6 +6,7 @@ public class PlayerProfile {
     private long userAccountId;
     private String displayName;
     private Visibility collectionVisibility;
+    private String avatarUrl;
 
     public PlayerProfile() {
     }
@@ -41,4 +42,8 @@ public class PlayerProfile {
     public void setCollectionVisibility(Visibility collectionVisibility) {
         this.collectionVisibility = collectionVisibility;
     }
+
+    public String getAvatarUrl() {return avatarUrl;}
+
+    public void setAvatarUrl(String avatarUrl) {this.avatarUrl = avatarUrl;}
 }

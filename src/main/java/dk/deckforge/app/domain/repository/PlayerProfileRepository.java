@@ -11,4 +11,6 @@ public interface PlayerProfileRepository {
     PlayerProfile save(PlayerProfile profile);
 
     void updateProfile(long userAccountId, String displayName, Visibility collectionVisibility);
+
+    void updateAvatarUrl(long userAccountId, String avatarUrl);
 }

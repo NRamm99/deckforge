@@ -84,7 +84,16 @@ public class ProfileService {
                 user.getEmail(),
                 profile.getDisplayName(),
                 profile.getCollectionVisibility(),
-                user.getRole()
+                user.getRole(),
+                profile.getAvatarUrl()
         );
+    }
+
+    @Transactional
+    public void updateAvatarUrl(String email, String avatarUrl) {
+        UserAccount user = userAccountRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        playerProfileRepository.updateAvatarUrl(user.getId(), avatarUrl);
     }
 }

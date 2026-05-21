@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS player_profile (
     user_account_id BIGINT UNIQUE NOT NULL,
     display_name VARCHAR(255) NOT NULL,
     collection_visibility VARCHAR(50) NOT NULL,
+    avatar_url VARCHAR(255),
     CONSTRAINT fk_player_profile_user_account
         FOREIGN KEY (user_account_id)
         REFERENCES user_account(id)
