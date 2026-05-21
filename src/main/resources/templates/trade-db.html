@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/trade.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title>Byttemarked - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="trade-card">
+        <div class="trade-card-font">
+            <div>
+                <h1>Byttemarked</h1>
+                <p th:if="${success}" th:text="${success}"></p>
+                <p th:if="${error}" th:text="${error}"></p>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(trades)}">
+            <p>Ingen åbne trades endnu.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(trades)}">
+            <article th:each="trade : ${trades}" class="trade-article">
+                <div class="trade-article-header">
+                    <div>
+                        <h2 th:text="'Trade #' + ${trade.id}">Trade #1</h2>
+                        <div class="trade-muted">
+                            <span th:text="'Oprettet af user #' + ${trade.creatorUserId}">Oprettet af user #1</span>
+                            <span th:text="' | Status: ' + ${trade.status}"> | Status: OPEN</span>
+                        </div>
+                        <div class="trade-spacer-top">
+                            <strong>Tilbyder:</strong>
+                            <div class="trade-inline-card-row">
+                                <div class="trade-inline-card" th:each="cc : ${trade.offeredCards}">
+                                    <img th:if="${cc.card.imageUrl}" th:src="${cc.card.imageUrl}" th:alt="${cc.card.name}" loading="lazy">
+                                    <span class="trade-inline-qty" th:text="${cc.quantity}">1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="trade-list-actions">
+                        <a class="btn deck-view-btn"
+                           th:href="@{/trades/{id}(id=${trade.id})}"
+                           aria-label="Se trade">
+                            Se
+                        </a>
+                        <button class="btn deck-view-btn trade-offers-button"
+                                th:if="${currentProfile.userId == trade.creatorUserId}"
+                                type="button"
+                                th:attr="data-dialog-id='trade-offers-' + ${trade.id}"
+                                aria-label="Se bud">
+                            Bud
+                        </button>
+                        <form th:if="${currentProfile.userId == trade.creatorUserId}"
+                              th:action="@{/trades/{tradeId}/delete(tradeId=${trade.id})}"
+                              method="post">
+                            <button class="btn deck-delete-btn" type="submit">Slet</button>
+                        </form>
+                        <a class="btn profile-btn trade-offer-btn"
+                           th:if="${currentProfile.userId != trade.creatorUserId}"
+                           th:href="@{/trades/{id}(id=${trade.id})}">
+                            Send bud
+                        </a>
+                    </div>
+                </div>
+
+                <dialog class="trade-preview-dialog" th:id="'trade-offers-' + ${trade.id}">
+                    <button class="trade-preview-close" type="button" aria-label="Luk">x</button>
+                    <div class="trade-preview-content">
+                        <div class="trade-preview-header">
+                            <div>
+                                <h3 th:text="'Bud for Trade #' + ${trade.id}">Bud for Trade #1</h3>
+                                <div class="trade-muted">
+                                    <span th:text="'Status: ' + ${trade.status}">Status: OPEN</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="trade-preview-section">
+                            <div th:if="${#lists.isEmpty(offersByTrade[trade.id])}">
+                                <p class="trade-empty">Ingen bud endnu.</p>
+                            </div>
+
+                            <div class="trade-offers-list" th:if="${!#lists.isEmpty(offersByTrade[trade.id])}">
+                                <article class="trade-article" th:each="offer : ${offersByTrade[trade.id]}">
+                                    <div class="trade-article-header">
+                                        <div>
+                                            <div class="trade-muted">
+                                                <strong th:text="'Offer #' + ${offer.id}">Offer #1</strong>
+                                                <span th:text="' | Fra user #' + ${offer.offerUserId}"> | Fra user #2</span>
+                                                <span th:text="' | Status: ' + ${offer.status}"> | Status: PENDING</span>
+                                            </div>
+                                            <div class="trade-spacer-top">
+                                                <strong>Tilbyder:</strong>
+                                                <div class="trade-inline-card-row">
+                                                    <div class="trade-inline-card" th:each="cc : ${offer.offeredCards}">
+                                                        <img th:if="${cc.card.imageUrl}" th:src="${cc.card.imageUrl}" th:alt="${cc.card.name}" loading="lazy">
+                                                        <span class="trade-inline-qty" th:text="${cc.quantity}">1</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="trade-offer-actions" th:if="${trade.status.name() == 'OPEN' and offer.status.name() == 'PENDING'}">
+                                            <form th:action="@{/trades/{tradeId}/offers/{offerId}/accept(tradeId=${trade.id}, offerId=${offer.id})}"
+                                                  method="post">
+                                                <button class="btn profile-btn" type="submit">Accepter</button>
+                                            </form>
+                                            <form th:action="@{/trades/{tradeId}/offers/{offerId}/decline(tradeId=${trade.id}, offerId=${offer.id})}"
+                                                  method="post">
+                                                <button class="btn deck-delete-btn" type="submit">Afvis</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                </dialog>
+            </article>
+        </div>
+    </section>
+</main>
+
+<script>
+    (function () {
+        document.querySelectorAll(".trade-offers-button").forEach((button) => {
+            button.addEventListener("click", () => {
+                document.getElementById(button.dataset.dialogId)?.showModal();
+            });
+        });
+
+        document.querySelectorAll(".trade-preview-dialog").forEach((dialog) => {
+            dialog.addEventListener("click", (event) => {
+                if (event.target === dialog) {
+                    dialog.close();
+                }
+            });
+
+            dialog.querySelector(".trade-preview-close")?.addEventListener("click", () => dialog.close());
+        });
+    })();
+</script>
+
+</body>
+</html>

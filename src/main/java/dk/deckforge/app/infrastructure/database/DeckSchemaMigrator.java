@@ -1,13 +1,14 @@
 package dk.deckforge.app.infrastructure.database;
 
-import jakarta.annotation.PostConstruct;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
 
 @Component
-public class DeckSchemaMigrator {
+public class DeckSchemaMigrator implements ApplicationRunner {
 
     private final DataSource dataSource;
 
@@ -15,7 +16,11 @@ public class DeckSchemaMigrator {
         this.dataSource = dataSource;
     }
 
-    @PostConstruct
+    @Override
+    public void run(ApplicationArguments args) {
+        addDeckVisibilityColumnIfMissing();
+    }
+
     public void addDeckVisibilityColumnIfMissing() {
         try (Connection conn = dataSource.getConnection()) {
 

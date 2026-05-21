@@ -1,4 +1,4 @@
-package dk.deckforge.app.domain.model;
+package dk.deckforge.app.domain.enums;
 
 public enum DeckFormat {
     COMMANDER(10, 10),
@@ -20,3 +20,4 @@ public enum DeckFormat {
         return maxDeckSize;
     }
 }
+

@@ -1,5 +1,7 @@
 package dk.deckforge.app.domain.model;
 
+import dk.deckforge.app.domain.enums.Visibility;
+
 public class PlayerProfile {
 
     private long id;

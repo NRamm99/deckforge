@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="da">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/trade.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <meta charset="UTF-8">
+    <title th:text="'Trade #' + ${trade.id} + ' - DeckForge'">Trade - DeckForge</title>
+</head>
+<body>
+
+<header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+</header>
+
+<main>
+    <section class="trade-card">
+        <div class="trade-card-font">
+            <div>
+                <h1 th:text="'Trade #' + ${trade.id}">Trade #1</h1>
+                <p class="trade-muted" th:text="'Oprettet af user #' + ${trade.creatorUserId}">Oprettet af user #1</p>
+                <p class="trade-muted" th:text="'Status: ' + ${trade.status}">Status: OPEN</p>
+                <p th:if="${success}" th:text="${success}"></p>
+                <p th:if="${error}" th:text="${error}"></p>
+            </div>
+
+            <div class="trade-header-actions">
+                <form th:if="${ownTrade and openTrade}" th:action="@{/trades/{tradeId}/delete(tradeId=${trade.id})}" method="post">
+                    <button class="btn deck-delete-btn" type="submit">Slet</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="trade-divider">
+            <h2>Trade tilbyder</h2>
+            <div class="trade-preview-card-grid">
+                <div class="trade-preview-card-tile" th:each="cc : ${trade.offeredCards}">
+                    <img th:if="${cc.card.imageUrl}" th:src="${cc.card.imageUrl}" th:alt="${cc.card.name}" loading="lazy">
+                    <span class="trade-card-qty-badge" th:text="${cc.quantity}">1</span>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${!ownTrade and openTrade}" class="trade-divider" id="offerBuilder">
+            <h2>Send bud</h2>
+
+            <div class="trade-divider">
+                <h3>Dine kort</h3>
+                <p class="trade-muted trade-helptext">Tryk + for at tilfoeje kort til listen nedenfor.</p>
+
+                <div class="trade-image-grid" th:if="${!#lists.isEmpty(collectionCards)}">
+                    <div class="trade-image-tile trade-db-tile" th:each="cc : ${collectionCards}">
+                        <img th:if="${cc.card.imageUrl}" th:src="${cc.card.imageUrl}" th:alt="${cc.card.name}" loading="lazy">
+
+                        <span class="trade-owned-badge" th:text="${cc.quantity}" th:if="${cc.quantity != null}">1</span>
+
+                        <button class="trade-add-button"
+                                type="button"
+                                th:attr="data-card-id=${cc.card.id},data-card-name=${cc.card.name},data-card-image=${cc.card.imageUrl},data-owned=${cc.quantity}"
+                                aria-label="Tilfoej kort"
+                                title="Tilfoej kort">+</button>
+                    </div>
+                </div>
+
+                <p class="trade-empty" th:if="${#lists.isEmpty(collectionCards)}">Ingen kort i din samling endnu.</p>
+            </div>
+
+            <form id="offerTradeForm" th:action="@{/trades/{id}/offer(id=${trade.id})}" method="post">
+                <div class="trade-divider">
+                    <div class="trade-selected-header">
+                        <h3>Valgte kort</h3>
+                        <span id="offerSelectedCount" class="trade-selected-count">0</span>
+                    </div>
+                    <div id="offerSelectedList" class="trade-selected-list">
+                        <p class="trade-empty">Ingen valgte kort.</p>
+                    </div>
+
+                    <div id="offerHiddenInputs"></div>
+
+                    <div class="trade-form-actions">
+                        <button id="offerSubmit" type="submit" class="btn profile-btn" disabled>Send</button>
+                        <a class="btn deck-view-btn" th:href="@{/trades}">Tilbage</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="trade-divider">
+            <h2>Bud</h2>
+
+            <div th:if="${#lists.isEmpty(offers)}">
+                <p>Ingen bud endnu.</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(offers)}">
+                <article th:each="offer : ${offers}" class="trade-article">
+                    <div class="trade-article-header">
+                        <div>
+                            <div class="trade-muted">
+                                <strong th:text="'Offer #' + ${offer.id}">Offer #1</strong>
+                                <span th:text="' | Fra user #' + ${offer.offerUserId}"> | Fra user #2</span>
+                                <span th:text="' | Status: ' + ${offer.status}"> | Status: PENDING</span>
+                            </div>
+                            <div class="trade-spacer-top">
+                                <strong>Tilbyder:</strong>
+                                <div class="trade-inline-card-row">
+                                    <div class="trade-inline-card" th:each="cc : ${offer.offeredCards}">
+                                        <img th:if="${cc.card.imageUrl}" th:src="${cc.card.imageUrl}" th:alt="${cc.card.name}" loading="lazy">
+                                        <span class="trade-inline-qty" th:text="${cc.quantity}">1</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form th:if="${ownTrade and openTrade and offer.status.name() == 'PENDING'}"
+                              th:action="@{/trades/{tradeId}/offers/{offerId}/accept(tradeId=${trade.id}, offerId=${offer.id})}"
+                              method="post">
+                            <button class="btn profile-btn" type="submit">Accepter</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    (function () {
+        const root = document.getElementById('offerBuilder');
+        if (!root) return;
+
+        const selected = new Map(); // cardId -> { id, name, imageUrl, owned, qty }
+        const listEl = document.getElementById('offerSelectedList');
+        const countEl = document.getElementById('offerSelectedCount');
+        const hiddenEl = document.getElementById('offerHiddenInputs');
+        const submitBtn = document.getElementById('offerSubmit');
+        const formEl = document.getElementById('offerTradeForm');
+
+        function rebuildHiddenInputs(items) {
+            if (!hiddenEl) return;
+            hiddenEl.innerHTML = '';
+            for (const it of items) {
+                const cardIdInput = document.createElement('input');
+                cardIdInput.type = 'hidden';
+                cardIdInput.name = 'cardIds';
+                cardIdInput.value = it.id;
+                hiddenEl.appendChild(cardIdInput);
+
+                const qtyInput = document.createElement('input');
+                qtyInput.type = 'hidden';
+                qtyInput.name = 'quantities';
+                qtyInput.value = String(it.qty);
+                hiddenEl.appendChild(qtyInput);
+            }
+        }
+
+        function render() {
+            if (!listEl || !countEl) return;
+            listEl.innerHTML = '';
+
+            const items = Array.from(selected.values()).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            const totalQty = items.reduce((sum, it) => sum + it.qty, 0);
+            countEl.textContent = String(totalQty);
+
+            if (submitBtn) submitBtn.disabled = items.length === 0;
+            rebuildHiddenInputs(items);
+
+            if (items.length === 0) {
+                const p = document.createElement('p');
+                p.className = 'trade-empty';
+                p.textContent = 'Ingen valgte kort.';
+                listEl.appendChild(p);
+                return;
+            }
+
+            for (const it of items) {
+                const row = document.createElement('div');
+                row.className = 'trade-selected-card';
+
+                const img = document.createElement('img');
+                img.alt = it.name || 'Card';
+                img.loading = 'lazy';
+                if (it.imageUrl) img.src = it.imageUrl;
+                row.appendChild(img);
+
+                const meta = document.createElement('div');
+                const strong = document.createElement('strong');
+                strong.textContent = it.name || 'Card';
+                meta.appendChild(strong);
+
+                const span = document.createElement('span');
+                span.textContent = `${it.qty}x (ejer ${it.owned}x)`;
+                meta.appendChild(span);
+                row.appendChild(meta);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'trade-remove-button';
+                removeBtn.textContent = '-';
+                removeBtn.setAttribute('aria-label', 'Fjern kort');
+                removeBtn.title = 'Fjern kort';
+                removeBtn.addEventListener('click', () => {
+                    const cur = selected.get(it.id);
+                    if (!cur) return;
+                    cur.qty -= 1;
+                    if (cur.qty <= 0) selected.delete(it.id);
+                    render();
+                });
+                row.appendChild(removeBtn);
+
+                listEl.appendChild(row);
+            }
+        }
+
+        root.querySelectorAll('.trade-add-button').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.cardId;
+                if (!id) return;
+
+                const owned = Number(btn.dataset.owned || '0');
+                const existing = selected.get(id);
+
+                if (existing) {
+                    if (owned > 0 && existing.qty >= owned) return;
+                    existing.qty += 1;
+                } else {
+                    selected.set(id, {
+                        id,
+                        name: btn.dataset.cardName || '',
+                        imageUrl: btn.dataset.cardImage || '',
+                        owned: owned,
+                        qty: 1
+                    });
+                }
+
+                render();
+            });
+        });
+
+        if (formEl) {
+            formEl.addEventListener('submit', (e) => {
+                if (selected.size === 0) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        render();
+    })();
+</script>
+
+</body>
+</html>

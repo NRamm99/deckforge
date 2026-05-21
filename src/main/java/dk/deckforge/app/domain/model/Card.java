@@ -1,5 +1,9 @@
 package dk.deckforge.app.domain.model;
 
+import dk.deckforge.app.domain.enums.CardColor;
+import dk.deckforge.app.domain.enums.CardRarity;
+import dk.deckforge.app.domain.enums.CardType;
+
 public class Card {
 
     private long id;

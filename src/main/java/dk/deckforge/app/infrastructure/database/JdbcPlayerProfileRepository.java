@@ -1,7 +1,7 @@
 package dk.deckforge.app.infrastructure.database;
 
 import dk.deckforge.app.domain.model.PlayerProfile;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.Visibility;
 import dk.deckforge.app.domain.repository.PlayerProfileRepository;
 import org.springframework.stereotype.Repository;
 

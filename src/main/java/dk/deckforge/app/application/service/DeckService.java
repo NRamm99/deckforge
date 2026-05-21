@@ -2,9 +2,9 @@ package dk.deckforge.app.application.service;
 
 import dk.deckforge.app.application.command.CreateDeckCommand;
 import dk.deckforge.app.domain.model.Deck;
-import dk.deckforge.app.domain.model.DeckFormat;
+import dk.deckforge.app.domain.enums.DeckFormat;
 import dk.deckforge.app.domain.model.CollectionCard;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.Visibility;
 import dk.deckforge.app.domain.repository.DeckRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

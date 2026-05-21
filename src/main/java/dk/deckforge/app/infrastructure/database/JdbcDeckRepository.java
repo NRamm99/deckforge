@@ -1,13 +1,13 @@
 package dk.deckforge.app.infrastructure.database;
 
 import dk.deckforge.app.domain.model.Deck;
-import dk.deckforge.app.domain.model.DeckFormat;
 import dk.deckforge.app.domain.model.Card;
-import dk.deckforge.app.domain.model.CardColor;
-import dk.deckforge.app.domain.model.CardRarity;
-import dk.deckforge.app.domain.model.CardType;
 import dk.deckforge.app.domain.model.CollectionCard;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.DeckFormat;
+import dk.deckforge.app.domain.enums.CardColor;
+import dk.deckforge.app.domain.enums.CardRarity;
+import dk.deckforge.app.domain.enums.CardType;
+import dk.deckforge.app.domain.enums.Visibility;
 import dk.deckforge.app.domain.repository.DeckRepository;
 import org.springframework.stereotype.Repository;
 

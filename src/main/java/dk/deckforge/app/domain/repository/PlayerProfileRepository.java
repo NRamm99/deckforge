@@ -1,7 +1,7 @@
 package dk.deckforge.app.domain.repository;
 
 import dk.deckforge.app.domain.model.PlayerProfile;
-import dk.deckforge.app.domain.model.Visibility;
+import dk.deckforge.app.domain.enums.Visibility;
 
 import java.util.Optional;
 

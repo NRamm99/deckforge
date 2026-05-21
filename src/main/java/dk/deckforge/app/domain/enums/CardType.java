@@ -1,4 +1,4 @@
-package dk.deckforge.app.domain.model;
+package dk.deckforge.app.domain.enums;
 
 public enum CardType {
     CREATURE,
@@ -9,3 +9,4 @@ public enum CardType {
     ENCHANTMENT,
     PLANESWALKER
 }
+

@@ -1,7 +1,7 @@
 package dk.deckforge.app.domain.repository;
 
 import dk.deckforge.app.domain.model.UserAccount;
-import dk.deckforge.app.domain.model.Role;
+import dk.deckforge.app.domain.enums.Role;
 
 import java.util.Optional;
 
