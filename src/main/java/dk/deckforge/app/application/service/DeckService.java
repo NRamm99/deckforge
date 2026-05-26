@@ -1,10 +1,9 @@
 package dk.deckforge.app.application.service;
 
 import dk.deckforge.app.application.command.CreateDeckCommand;
-import dk.deckforge.app.domain.model.Deck;
-import dk.deckforge.app.domain.enums.DeckFormat;
 import dk.deckforge.app.domain.model.CollectionCard;
-import dk.deckforge.app.domain.enums.Visibility;
+import dk.deckforge.app.domain.model.Deck;
+import dk.deckforge.app.domain.model.DeckCards;
 import dk.deckforge.app.domain.repository.DeckRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,16 +25,19 @@ public class DeckService {
 
     @Transactional
     public Deck saveDeck(CreateDeckCommand command) {
-        validateDeck(command.userAccountId(), command.name(), command.format(), command.conceptDeck(), command.cardQuantities());
-
-        Deck deck = new Deck(
+        DeckCards deckCards = DeckCards.from(command.cardQuantities());
+        Map<Long, Integer> ownedQuantities = command.conceptDeck() ? Map.of() : ownedQuantitiesForUser(command.userAccountId());
+        Deck deck = Deck.create(
                 command.userAccountId(),
-                command.name().trim(),
+                command.name(),
                 command.format(),
                 command.conceptDeck(),
-                command.visibility() == null ? Visibility.PUBLIC : command.visibility()
+                command.visibility(),
+                deckCards,
+                ownedQuantities
         );
-        return deckRepository.save(deck, command.cardQuantities());
+
+        return deckRepository.save(deck, deckCards.asMap());
     }
 
     public List<Deck> getDecksForUser(long userAccountId) {
@@ -56,38 +58,8 @@ public class DeckService {
         deckRepository.deleteByIdAndUserAccountId(deckId, userAccountId);
     }
 
-    private void validateDeck(long userAccountId, String name, DeckFormat format, boolean conceptDeck, Map<Long, Integer> cardQuantities) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Decknavn er påkrævet.");
-        }
-        if (format == null) {
-            throw new IllegalArgumentException("Vælg et format.");
-        }
-
-        if (cardQuantities == null) {
-            throw new IllegalArgumentException("Decket har ingen kort.");
-        }
-
-        int deckSize = cardQuantities.values().stream().mapToInt(Integer::intValue).sum();
-        if (deckSize < format.getMinDeckSize() || deckSize > format.getMaxDeckSize()) {
-            throw new IllegalArgumentException(format.name() + " kræver " + format.getMinDeckSize()
-                    + "-" + format.getMaxDeckSize() + " kort. Decket har " + deckSize + ".");
-        }
-
-        if (!conceptDeck) {
-            validateOwnedQuantities(userAccountId, cardQuantities);
-        }
-    }
-
-    private void validateOwnedQuantities(long userAccountId, Map<Long, Integer> cardQuantities) {
-        Map<Long, Integer> ownedQuantities = collectionService.getFilteredCardsForUser(userAccountId, null).stream()
+    private Map<Long, Integer> ownedQuantitiesForUser(long userAccountId) {
+        return collectionService.getFilteredCardsForUser(userAccountId, null).stream()
                 .collect(Collectors.toMap(collectionCard -> collectionCard.getCard().getId(), CollectionCard::getQuantity));
-
-        for (Map.Entry<Long, Integer> entry : cardQuantities.entrySet()) {
-            int ownedQuantity = ownedQuantities.getOrDefault(entry.getKey(), 0);
-            if (entry.getValue() > ownedQuantity) {
-                throw new IllegalArgumentException("Decket indeholder flere kopier af et kort, end du ejer.");
-            }
-        }
     }
 }

@@ -3,6 +3,8 @@ package dk.deckforge.app.domain.model;
 import dk.deckforge.app.domain.enums.DeckFormat;
 import dk.deckforge.app.domain.enums.Visibility;
 
+import java.util.Map;
+
 public class Deck {
 
     private long id;
@@ -22,6 +24,38 @@ public class Deck {
         this.format = format;
         this.conceptDeck = conceptDeck;
         this.visibility = visibility;
+    }
+
+    public static Deck create(long userAccountId,
+                              String name,
+                              DeckFormat format,
+                              boolean conceptDeck,
+                              Visibility visibility,
+                              DeckCards cards,
+                              Map<Long, Integer> ownedQuantities) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Decknavn er påkrævet.");
+        }
+        if (format == null) {
+            throw new IllegalArgumentException("Vælg et format.");
+        }
+        if (cards == null) {
+            throw new IllegalArgumentException("Decket har ingen kort.");
+        }
+
+        int deckSize = cards.totalQuantity();
+        if (deckSize < format.getMinDeckSize() || deckSize > format.getMaxDeckSize()) {
+            throw new IllegalArgumentException(format.name() + " kræver " + format.getMinDeckSize()
+                    + "-" + format.getMaxDeckSize() + " kort. Decket har " + deckSize + ".");
+        }
+
+        if (!conceptDeck) {
+            cards.validateOwnedQuantities(ownedQuantities);
+        }
+
+        Deck deck = new Deck(userAccountId, name.trim(), format, conceptDeck, visibility == null ? Visibility.PUBLIC : visibility);
+        deck.setCardCount(deckSize);
+        return deck;
     }
 
     public long getId() {

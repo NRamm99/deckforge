@@ -25,6 +25,15 @@ public class DeckController {
         this.profileService = profileService;
     }
 
+    @GetMapping("/decks")
+    public String ownDecks(Principal principal, Model model) {
+        ProfileView profile = profileService.getProfileByEmail(principal.getName());
+        model.addAttribute("profile", profile);
+        model.addAttribute("decks", deckService.getDecksForUser(profile.getUserId()));
+        model.addAttribute("ownProfile", true);
+        return "decks";
+    }
+
     @GetMapping("/profile/{id}/decks")
     public String profileDecks(@PathVariable long id, Principal principal, Model model) {
         ProfileView profile = profileService.getProfileByUserId(id);

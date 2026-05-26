@@ -21,6 +21,7 @@
                 <p th:if="${success}" th:text="${success}"></p>
                 <p th:if="${error}" th:text="${error}"></p>
             </div>
+            <a class="btn profile-btn" th:href="@{/trades/new}">Opret trade</a>
         </div>
 
         <div th:if="${#lists.isEmpty(trades)}">

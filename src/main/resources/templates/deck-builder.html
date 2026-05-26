@@ -166,6 +166,31 @@
                 <span th:text="${deckCardCount} + ' kort'">0 kort</span>
             </div>
 
+            <section class="deck-builder-status"
+                     th:attr="data-card-count=${deckCardCount}"
+                     aria-label="Deckstatus">
+                <div class="deck-builder-status-main">
+                    <span class="deck-builder-status-label">Kort</span>
+                    <strong id="deckStatusCount"
+                            th:text="${deckCardCount} + ' / ' + ${selectedFormat.minDeckSize}">0 / 20</strong>
+                </div>
+                <div class="deck-builder-status-grid">
+                    <div>
+                        <span>Format</span>
+                        <strong id="deckStatusFormat" th:text="${selectedFormat}">STANDARD</strong>
+                    </div>
+                    <div>
+                        <span>Status</span>
+                        <strong id="deckStatusMissing"
+                                th:text="${deckCardCount < selectedFormat.minDeckSize ? 'Mangler ' + (selectedFormat.minDeckSize - deckCardCount) : 'Klar'}">Mangler 20</strong>
+                    </div>
+                </div>
+                <div class="deck-builder-progress" aria-hidden="true">
+                    <span id="deckStatusProgress"
+                          th:style="'width: ' + ${T(java.lang.Math).min(100, deckCardCount * 100 / selectedFormat.minDeckSize)} + '%'"></span>
+                </div>
+            </section>
+
             <div class="deck-builder-selected-list" th:if="${!#lists.isEmpty(selectedCards)}">
                 <div class="deck-builder-selected-card" th:each="cardView : ${selectedCards}">
                     <img th:if="${cardView.card.imageUrl}"
@@ -197,6 +222,7 @@
                     <select id="format" name="format">
                         <option th:each="format : ${formats}"
                                 th:value="${format}"
+                                th:attr="data-min=${format.minDeckSize},data-max=${format.maxDeckSize}"
                                 th:text="${format + ' (' + format.minDeckSize + '-' + format.maxDeckSize + ' kort)'}"
                                 th:selected="${format == selectedFormat}"></option>
                     </select>
@@ -225,21 +251,61 @@
 </main>
 
 <script>
-    document.querySelectorAll(".card-preview-button").forEach((button) => {
-        button.addEventListener("click", () => {
-            document.getElementById(button.dataset.dialogId)?.showModal();
-        });
-    });
+    (function () {
+        const status = document.querySelector(".deck-builder-status");
+        const formatSelect = document.getElementById("format");
+        const countEl = document.getElementById("deckStatusCount");
+        const formatEl = document.getElementById("deckStatusFormat");
+        const missingEl = document.getElementById("deckStatusMissing");
+        const progressEl = document.getElementById("deckStatusProgress");
+        const cardCount = Number(status?.dataset.cardCount || "0");
 
-    document.querySelectorAll(".card-preview-dialog").forEach((dialog) => {
-        dialog.addEventListener("click", (event) => {
-            if (event.target === dialog) {
-                dialog.close();
+        function updateDeckStatus() {
+            if (!formatSelect || !countEl || !formatEl || !missingEl || !progressEl) return;
+
+            const selected = formatSelect.selectedOptions[0];
+            const min = Number(selected?.dataset.min || "0");
+            const max = Number(selected?.dataset.max || min || "1");
+            const target = min === max ? min : min;
+            const overMax = cardCount > max;
+            const missing = Math.max(0, min - cardCount);
+            const progressTarget = Math.max(1, target);
+            const progress = Math.min(100, Math.round((cardCount / progressTarget) * 100));
+
+            countEl.textContent = `${cardCount} / ${target}`;
+            formatEl.textContent = selected?.value || "-";
+            progressEl.style.width = `${progress}%`;
+            progressEl.classList.toggle("is-complete", missing === 0 && !overMax);
+            progressEl.classList.toggle("is-over", overMax);
+
+            if (overMax) {
+                missingEl.textContent = `For mange: ${cardCount - max}`;
+            } else if (missing > 0) {
+                missingEl.textContent = `Mangler ${missing}`;
+            } else {
+                missingEl.textContent = "Klar";
             }
+        }
+
+        formatSelect?.addEventListener("change", updateDeckStatus);
+        updateDeckStatus();
+
+        document.querySelectorAll(".card-preview-button").forEach((button) => {
+            button.addEventListener("click", () => {
+                document.getElementById(button.dataset.dialogId)?.showModal();
+            });
         });
 
-        dialog.querySelector(".card-preview-close")?.addEventListener("click", () => dialog.close());
-    });
+        document.querySelectorAll(".card-preview-dialog").forEach((dialog) => {
+            dialog.addEventListener("click", (event) => {
+                if (event.target === dialog) {
+                    dialog.close();
+                }
+            });
+
+            dialog.querySelector(".card-preview-close")?.addEventListener("click", () => dialog.close());
+        });
+    })();
 </script>
 
 </body>

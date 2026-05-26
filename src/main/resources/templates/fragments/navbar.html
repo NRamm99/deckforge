@@ -3,15 +3,21 @@
         <img th:src="@{/images/deckforgelogo.png}" alt="DeckForge">
     </div>
 
-    <div class="nav-links">
-        <a th:href="@{/profile}" th:classappend="${#strings.startsWith(currentPath, '/profile') || #strings.startsWith(currentPath, '/collection')} ? 'active'">Profil</a>
-        <a th:href="@{/events}" th:classappend="${#strings.startsWith(currentPath, '/events')} ? 'active'">Events</a>
-        <a th:href="@{/trades}"
-           th:classappend="${#strings.equals(currentPath, '/trades') || (#strings.startsWith(currentPath, '/trades/') && !#strings.startsWith(currentPath, '/trades/new'))} ? 'active'">Byttemarked</a>
-        <a th:href="@{/trades/new}" th:classappend="${#strings.startsWith(currentPath, '/trades/new')} ? 'active'">Opret trade</a>
-        <a th:href="@{/card-db}" th:classappend="${#strings.startsWith(currentPath, '/card-db')} ? 'active'">Kortdatabase</a>
-        <a th:href="@{/deck-builder}" th:classappend="${#strings.startsWith(currentPath, '/deck-builder')} ? 'active'">Deck-builder</a>
-        <a th:href="@{/create-card}" th:classappend="${#strings.startsWith(currentPath, '/create-card')} ? 'active'">Opret kort</a>
-        
+    <div class="nav-links" aria-label="Primær navigation">
+        <div class="nav-primary">
+            <a th:href="@{/collection}"
+               th:classappend="${#strings.startsWith(currentPath, '/collection') || (#strings.startsWith(currentPath, '/profile/') && #strings.contains(currentPath, '/collection'))} ? 'active'">Samling</a>
+            <a th:href="@{/decks}"
+               th:classappend="${#strings.startsWith(currentPath, '/decks') || #strings.startsWith(currentPath, '/deck-builder') || (#strings.startsWith(currentPath, '/profile/') && #strings.contains(currentPath, '/decks'))} ? 'active'">Decks</a>
+            <a th:href="@{/events}"
+               th:classappend="${#strings.startsWith(currentPath, '/events')} ? 'active'">Events</a>
+            <a th:href="@{/trades}"
+               th:classappend="${#strings.startsWith(currentPath, '/trades')} ? 'active'">Bytning</a>
+        </div>
+
+        <div class="nav-secondary" aria-label="Sekundær navigation">
+            <a th:href="@{/card-db}" th:classappend="${#strings.startsWith(currentPath, '/card-db') || #strings.startsWith(currentPath, '/create-card')} ? 'active'">Kortdatabase</a>
+            <a th:href="@{/profile}" th:classappend="${#strings.equals(currentPath, '/profile') || #strings.startsWith(currentPath, '/profile/debug')} ? 'active'">Profil</a>
+        </div>
     </div>
 </nav>

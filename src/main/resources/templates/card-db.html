@@ -17,7 +17,10 @@
 <main class="page">
 
     <section class="panel">
-        <h1>Kortdatabase</h1>
+        <div class="panel-header">
+            <h1>Kortdatabase</h1>
+            <a class="btn panel-action" th:href="@{/create-card}">Opret kort</a>
+        </div>
 
         <form th:action="@{/card-db}" method="get" th:object="${filter}" class="form">
             <div class="form-row">

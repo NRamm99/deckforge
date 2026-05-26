@@ -29,6 +29,33 @@
     font-size: 22px;
 }
 
+.card-db .panel-header {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.card-db .panel-header h1 {
+    margin-bottom: 0;
+}
+
+.card-db .panel-action {
+    width: auto;
+    min-width: 120px;
+    height: 42px;
+    margin: 0;
+    padding: 0 14px;
+    border-radius: 10px;
+}
+
+.card-db .panel-action:hover {
+    width: auto;
+    height: 42px;
+    font-size: 16px;
+}
+
 .card-db .message {
     width: auto;
     margin: 0 0 14px;
@@ -488,6 +515,78 @@
     font-weight: bold;
 }
 
+.deck-builder .deck-builder-status {
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+    background: #111827;
+    border: 1px solid rgba(39, 174, 96, 0.35);
+    border-radius: 8px;
+}
+
+.deck-builder .deck-builder-status-main {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.deck-builder .deck-builder-status-label,
+.deck-builder .deck-builder-status-grid span {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.deck-builder .deck-builder-status-main strong {
+    color: whitesmoke;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.deck-builder .deck-builder-status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.deck-builder .deck-builder-status-grid div {
+    min-width: 0;
+}
+
+.deck-builder .deck-builder-status-grid strong {
+    margin-top: 4px;
+    display: block;
+    color: whitesmoke;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.deck-builder .deck-builder-progress {
+    height: 8px;
+    overflow: hidden;
+    background: rgba(148, 163, 184, 0.22);
+    border-radius: 999px;
+}
+
+.deck-builder .deck-builder-progress span {
+    width: 0;
+    height: 100%;
+    display: block;
+    background: #f97316;
+    border-radius: inherit;
+    transition: width 0.18s ease, background-color 0.18s ease;
+}
+
+.deck-builder .deck-builder-progress span.is-complete {
+    background: #27ae60;
+}
+
+.deck-builder .deck-builder-progress span.is-over {
+    background: #dc2626;
+}
+
 .deck-builder .deck-builder-selected-list {
     display: grid;
     gap: 10px;
@@ -577,6 +676,10 @@
 }
 
 @media (max-width: 820px) {
+    .card-db .panel-header {
+        flex-direction: column;
+    }
+
     .card-db .form-row-3 {
         grid-template-columns: 1fr;
     }
